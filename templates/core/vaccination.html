@@ -1,0 +1,430 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vacinação - FalaUBS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .search-bar {
+            border-color: rgba(37, 99, 235, 0.76);
+            background-color: rgba(217, 217, 217, 0.58);
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-active {
+            color: #2563EB;
+            border-bottom: 2px solid #2563EB;
+        }
+        .tab-inactive {
+            color: #6B7280;
+            border-bottom: none;
+        }
+        .category-selected {
+            background-color: #60A5FA;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .category-unselected {
+            background-color: white;
+            color: black;
+            border: 1px solid #E5E7EB;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="w-full bg-blue-700 text-white flex items-center justify-between px-4 py-3">
+        <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-semibold flex items-center space-x-2">
+                <img src="{% static 'icons/Icon_ubs.png' %}" alt="UBS Icon" class="h-6" />
+                <span>Bem-vindo ao FalaUBS</span>
+            </h1>
+        </div>
+        <button aria-label="Menu" class="focus:outline-none">
+            <img src="{% static 'icons/Icon_menu_white.png' %}" alt="Menu Icon" class="h-8" />
+        </button>
+    </header>
+
+    <div class="max-w-5xl mx-auto p-4">
+        <!-- Back Button and Title -->
+        <div class="flex items-center mb-6 space-x-4">
+            <button aria-label="Back" onclick="window.history.back()" class="focus:outline-none">
+                <img src="{% static 'icons/Icon_return.png' %}" alt="Back Icon" class="w-6 h-6" />
+            </button>
+            <h2 class="text-2xl font-semibold">Vacinação</h2>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative mb-4">
+            <input 
+                type="text" 
+                id="searchInput" 
+                autocomplete="off" 
+                placeholder="Pesquisar Vacinas" 
+                class="w-full p-3 rounded-lg search-bar focus:outline-none focus:ring-2 focus:ring-blue-500 pl-12 pr-12" 
+            />
+            <img src="{% static 'icons/Icon_search.png' %}" alt="Search Icon" 
+                class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2" />
+            <button class="absolute right-4 top-1/2 transform -translate-y-1/2 focus:outline-none">
+                <img src="{% static 'icons/Icon_microphone.png' %}" alt="Microphone Icon" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <!-- Suggestion Message -->
+        <div id="suggestionMessage" class="text-sm text-blue-600 mb-4 hidden bg-blue-50 p-2 rounded-md"></div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="text-sm text-gray-500 text-center py-4 hidden">
+            Nenhuma vacina encontrada.
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex mb-6 border-b border-gray-200">
+            <button id="highlightsBtn" class="flex-1 py-2 font-semibold tab-active focus:outline-none">
+                Destaques
+            </button>
+            <button id="categoriesBtn" class="flex-1 py-2 font-semibold tab-inactive focus:outline-none">
+                Categorias
+            </button>
+        </div>
+
+        <!-- Categories Filter -->
+        <div id="categoriesFilter" class="hidden mb-6 overflow-x-auto whitespace-nowrap space-x-4 scrollbar-hide">
+            <button class="category-unselected px-4 py-2 rounded-full" data-category="Criança">Criança</button>
+            <button class="category-unselected px-4 py-2 rounded-full" data-category="Adolescente">Adolescente</button>
+            <button class="category-unselected px-4 py-2 rounded-full" data-category="Adulto">Adulto</button>
+            <button class="category-unselected px-4 py-2 rounded-full" data-category="Gestante">Gestante</button>
+            <button class="category-unselected px-4 py-2 rounded-full" data-category="Idoso">Idoso</button>
+        </div>
+
+        <!-- Highlights Content -->
+        <div id="highlightsContent" class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[calc(100vh-280px)] scrollbar-hide">
+            <!-- Vaccine cards will be rendered here -->
+        </div>
+
+        <!-- Categories Content -->
+        <div id="categoriesContent" class="hidden">
+            <p id="noCategorySelected" class="text-center text-gray-500 mt-8">
+                Selecione uma categoria para ver as vacinas.
+            </p>
+            <div id="categoryResults" class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[calc(100vh-280px)] scrollbar-hide hidden">
+                <!-- Category cards will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    {{ vaccines|json_script:"vaccines-data" }}
+    <script>
+        // Function to navigate to UBS detail page
+        function goToUBS(ubsName) {
+            const baseUrl = "{% url 'ubs_detail' 'PLACEHOLDER' %}";
+            window.location.href = baseUrl.replace('PLACEHOLDER', encodeURIComponent(ubsName));
+        }
+
+        // Initialize vaccines from Django template context
+        const vaccinesRawData = JSON.parse(document.getElementById('vaccines-data').textContent);
+        const vaccines = vaccinesRawData.map(vaccine => ({
+            name: vaccine.name,
+            description: vaccine.description,
+            audience: vaccine.age_group.split(',').map(s => s.trim()),
+            status: vaccine.status,
+            location: vaccine.unit,
+            scheduling: vaccine.scheduling
+        }));
+
+        // Utility function: Calculate Levenshtein Distance
+        function levenshteinDistance(a, b) {
+            if (a.length === 0) return b.length;
+            if (b.length === 0) return a.length;
+
+            const matrix = [];
+            for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+            for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+            for (let i = 1; i <= b.length; i++) {
+                for (let j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1).toLowerCase() === a.charAt(j - 1).toLowerCase()) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            Math.min(
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j] + 1
+                            )
+                        );
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        }
+
+        // Find closest match using Levenshtein distance
+        function findClosestMatch(query) {
+            let bestMatch = null;
+            let bestDistance = Infinity;
+            
+            for (const vaccine of vaccines) {
+                const distance = levenshteinDistance(query.toLowerCase(), vaccine.name.toLowerCase());
+                if (distance < bestDistance && distance <= 3) {
+                    bestDistance = distance;
+                    bestMatch = vaccine.name;
+                }
+            }
+            
+            return bestMatch;
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Filter vaccines based on search query and categories
+        function filterVaccines(query, selectedCategories = []) {
+            query = query.trim().toLowerCase();
+            let filteredVaccines = [...vaccines];
+
+            // Filter by search query if not empty
+            if (query !== '') {
+                filteredVaccines = filteredVaccines.filter(vaccine => {
+                    const searchableText = `${vaccine.name} ${vaccine.description}`.toLowerCase();
+                    const words = searchableText.split(/\s+/);
+                    return words.some(word => word.includes(query)) || searchableText.includes(query);
+                });
+            }
+
+            // Filter by selected categories if any
+            if (selectedCategories.length > 0) {
+                filteredVaccines = filteredVaccines.filter(vaccine =>
+                    vaccine.audience.some(aud => selectedCategories.includes(aud))
+                );
+            }
+
+            return filteredVaccines;
+        }
+
+        // Update UI based on filtered results
+        function updateUI(filteredVaccines, query) {
+            const suggestionMessage = document.getElementById('suggestionMessage');
+            const noResults = document.getElementById('noResults');
+            const highlightsContent = document.getElementById('highlightsContent');
+            const categoryResults = document.getElementById('categoryResults');
+
+            // Reset messages
+            suggestionMessage.classList.add('hidden');
+            noResults.classList.add('hidden');
+
+            // Show suggestion if no results but have a close match
+            if (filteredVaccines.length === 0 && query.length >= 3) {
+                const suggestion = findClosestMatch(query);
+                if (suggestion) {
+                    suggestionMessage.textContent = `Você quis dizer: ${suggestion}?`;
+                    suggestionMessage.classList.remove('hidden');
+                    suggestionMessage.style.cursor = 'pointer';
+                    suggestionMessage.onclick = () => {
+                        document.getElementById('searchInput').value = suggestion;
+                        handleSearch();
+                    };
+                }
+            }
+
+            // Show no results message if necessary
+            if (filteredVaccines.length === 0 && query !== '') {
+                noResults.classList.remove('hidden');
+            }
+
+            // Update content based on active tab
+            if (categoriesContent.classList.contains('hidden')) {
+                renderHighlights(filteredVaccines);
+            } else {
+                renderCategories(selectedCategories, filteredVaccines);
+            }
+        }
+
+        function renderVaccineCard(vaccine, container, showAudience = false) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-2xl shadow p-6 relative hover:shadow-lg transition-shadow cursor-pointer';
+            
+            // Get all UBSs that have this vaccine
+            const ubsLocations = vaccinesRawData
+                .filter(v => v.name === vaccine.name)
+                .map(v => ({
+                    name: v.unit,
+                    status: v.status,
+                    scheduling: v.scheduling
+                }));
+            
+            card.innerHTML = `
+                <div class="pr-6">
+                    <h3 class="text-lg font-bold mb-2">${vaccine.name}</h3>
+                    ${showAudience ? 
+                        `<p class="text-sm text-gray-600 mb-3">${vaccine.audience.join(', ')}</p>` :
+                        `<p class="text-sm text-gray-600 mb-3">${vaccine.description}</p>`
+                    }
+                </div>
+                <div class="absolute right-6 top-6">
+                    <img src="{% static 'icons/Icon_forward.png' %}" alt="Forward" class="w-5 h-5" />
+                </div>
+                <div class="space-y-3 mt-4">
+                    ${ubsLocations.map(ubs => `
+                        <div class="border-t pt-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="{% static 'icons/Icon_location.png' %}" alt="Location" class="w-4 h-4 mr-2" />
+                                    <span class="text-sm text-gray-700">${ubs.name}</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-blue-600">${ubs.status}</span>
+                                    <span class="text-gray-400">•</span>
+                                    <span class="text-sm text-gray-600">${ubs.scheduling}</span>
+                                </div>
+                                <a href="javascript:void(0)" 
+                                   onclick="goToUBS('${ubs.name}')"
+                                   class="ml-2 text-blue-600 hover:text-blue-800">
+                                    Ver UBS
+                                </a>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // Make the entire card clickable to go to the first UBS
+            if (ubsLocations.length > 0) {
+                card.addEventListener('click', (e) => {
+                    // Don't trigger if clicking on a "Ver UBS" link
+                    if (!e.target.closest('a')) {
+                        goToUBS(`${ubsLocations[0].name}`);
+                    }
+                });
+            }
+            
+            container.appendChild(card);
+        }
+
+        function renderHighlights(filteredVaccines) {
+            const container = document.getElementById('highlightsContent');
+            container.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[calc(100vh-280px)] scrollbar-hide';
+            container.innerHTML = '';
+            
+            filteredVaccines.forEach(vaccine => {
+                renderVaccineCard(vaccine, container, false);
+            });
+        }
+
+        function renderCategories(selectedCategories, filteredVaccines) {
+            const categoryResults = document.getElementById('categoryResults');
+            const noCategorySelected = document.getElementById('noCategorySelected');
+            
+            if (selectedCategories.length === 0) {
+                categoryResults.classList.add('hidden');
+                noCategorySelected.classList.remove('hidden');
+                return;
+            }
+
+            noCategorySelected.classList.add('hidden');
+            categoryResults.classList.remove('hidden');
+            categoryResults.innerHTML = '';
+            
+            const visibleVaccines = filteredVaccines.filter(vaccine =>
+                vaccine.audience.some(aud => selectedCategories.includes(aud))
+            );
+
+            visibleVaccines.forEach(vaccine => {
+                renderVaccineCard(vaccine, categoryResults, true);
+            });
+        }
+
+        // Handle search input
+        function handleSearch() {
+            const query = searchInput.value;
+            const filteredVaccines = filterVaccines(query, selectedCategories);
+            updateUI(filteredVaccines, query);
+        }
+
+        // Initialize variables and event listeners
+        const searchInput = document.getElementById('searchInput');
+        const highlightsBtn = document.getElementById('highlightsBtn');
+        const categoriesBtn = document.getElementById('categoriesBtn');
+        const highlightsContent = document.getElementById('highlightsContent');
+        const categoriesContent = document.getElementById('categoriesContent');
+        const categoriesFilter = document.getElementById('categoriesFilter');
+        let selectedCategories = [];
+
+        // Add search input listener with debounce
+        searchInput.addEventListener('input', debounce(handleSearch, 150));
+
+        // Tab switching logic
+        highlightsBtn.addEventListener('click', () => {
+            highlightsBtn.classList.add('tab-active');
+            highlightsBtn.classList.remove('tab-inactive');
+            categoriesBtn.classList.add('tab-inactive');
+            categoriesBtn.classList.remove('tab-active');
+            highlightsContent.classList.remove('hidden');
+            categoriesContent.classList.add('hidden');
+            categoriesFilter.classList.add('hidden');
+            
+            // Clear category selections
+            selectedCategories = [];
+            categoryButtons.forEach(btn => {
+                btn.classList.remove('category-selected');
+                btn.classList.add('category-unselected');
+            });
+            
+            // Show all vaccines in highlights view
+            handleSearch();
+        });
+
+        categoriesBtn.addEventListener('click', () => {
+            categoriesBtn.classList.add('tab-active');
+            categoriesBtn.classList.remove('tab-inactive');
+            highlightsBtn.classList.add('tab-inactive');
+            highlightsBtn.classList.remove('tab-active');
+            categoriesContent.classList.remove('hidden');
+            highlightsContent.classList.add('hidden');
+            categoriesFilter.classList.remove('hidden');
+            handleSearch(); // Re-run search for the current tab
+        });
+
+        // Category filter buttons
+        const categoryButtons = document.querySelectorAll('#categoriesFilter button');
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.getAttribute('data-category');
+                const index = selectedCategories.indexOf(category);
+                
+                if (index > -1) {
+                    selectedCategories.splice(index, 1);
+                    btn.classList.remove('category-selected');
+                    btn.classList.add('category-unselected');
+                } else {
+                    selectedCategories.push(category);
+                    btn.classList.add('category-selected');
+                    btn.classList.remove('category-unselected');
+                }
+                
+                handleSearch(); // Re-run search with updated categories
+            });
+        });
+
+        // Initial render
+        updateUI(vaccines, '');
+    </script>
+</body>
+</html>

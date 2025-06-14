@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home - FalaUBS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-xl font-bold">
+            Bem-vindo ao FalaUBS, {{ usuario.nome }}!
+        </h1>
+        <p class="text-sm">Você está logado como <strong>{{ usuario.tipo }}</strong></p>
+    </header>
+
+    <main class="flex-grow p-6">
+        <section class="mb-6">
+            <h2 class="text-lg font-semibold mb-2">Mapa das UBS próximas</h2>
+            <div class="bg-white rounded shadow p-4 h-64 flex items-center justify-center text-gray-400">
+                [Mapa Placeholder]
+            </div>
+        </section>
+
+        <section class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <a href="{% url 'vaccination' %}" class="bg-white rounded shadow p-4 text-center hover:bg-blue-50 transition">Vacinação</a>
+            <a href="{% url 'scheduling' %}" class="bg-white rounded shadow p-4 text-center hover:bg-blue-50 transition">Agendamento</a>
+            <a href="#" class="bg-white rounded shadow p-4 text-center hover:bg-blue-50 transition">Agenda Pessoal</a>
+            <a href="{% url 'ubs_nearby' %}" class="bg-white rounded shadow p-4 text-center hover:bg-blue-50 transition">UBSs Próximas</a>
+            <a href="#" class="bg-white rounded shadow p-4 text-center hover:bg-blue-50 transition">Chat</a>
+        </section>
+
+        <button class="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition">
+            Chat
+        </button>
+    </main>
+
+</body>
+</html>

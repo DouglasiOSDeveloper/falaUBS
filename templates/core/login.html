@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fala, UBS! - Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
+        <div class="flex justify-between mb-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/SUS_logo.svg" alt="Logo SUS" class="h-10">
+            <img src="https://cdn.saude.gov.br/images/svg/bsf-logo.svg" alt="Logo Saúde Família" class="h-10">
+        </div>
+        <h1 class="text-3xl font-bold mb-6">Fala, UBS!</h1>
+        <h2 class="text-xl font-semibold mb-4">Login – SouGov</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="text-left">
+                <label for="cpf" class="block font-medium">CPF:</label>
+                <input type="text" id="cpf" name="cpf" class="w-full p-2 border border-gray-300 rounded mb-4" placeholder="000.000.000-00">
+
+                <label for="senha" class="block font-medium">Senha:</label>
+                <input type="password" id="senha" name="senha" class="w-full p-2 border border-gray-300 rounded mb-4" placeholder="Digite sua senha">
+
+                <label for="codigo" class="block font-medium">Código de Acesso</label>
+                <input type="text" id="codigo" name="codigo" class="w-full p-2 border border-gray-300 rounded mb-4" placeholder="Informe o código">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-800 text-white py-2 rounded mb-2">Entrar</button>
+            <button type="button" class="w-full bg-white border border-gray-300 py-2 rounded font-semibold">Obter código de acesso</button>
+
+            <a href="#" class="text-sm text-blue-600 block mt-2">Esqueci minha senha</a>
+            <p class="text-xs text-gray-500 mt-4">Ainda não tem cadastro? Acesse o portal do governo em <a href="https://www.gov.br" target="_blank" class="text-blue-600">gov.br</a></p>
+        </form>
+    </div>
+</body>
+</html>
