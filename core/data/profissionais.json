@@ -1,0 +1,16 @@
+[
+  {
+    "cpf": "333.333.333-33",
+    "senha": "prof123",
+    "nome": "Dr. Carlos Mendes",
+    "ubs": "UBS Central",
+    "tipo": "profissional"
+  },
+  {
+    "cpf": "444.444.444-44",
+    "senha": "prof456",
+    "nome": "Enf. Ana Costa",
+    "ubs": "UBS Norte",
+    "tipo": "profissional"
+  }
+]

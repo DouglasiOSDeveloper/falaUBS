@@ -1,0 +1,93 @@
+<!-- agenda_pessoal.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meus Agendamentos - FalaUBS</title>
+  {% load static %}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+
+<body class="bg-gray-100">
+  <header class="w-full bg-blue-700 text-white flex items-center justify-between px-4 py-3">
+    <div class="flex items-center space-x-2">
+      <img src="{% static 'logo_sus.png' %}" alt="Logo SUS" class="h-6">
+      <h1 class="text-lg font-semibold">Bem-vindo ao FalaUBS</h1>
+    </div>
+    <i class="fas fa-bars"></i>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-6">
+    <div class="flex items-center space-x-4 mb-6">
+      <button onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+      <h2 class="text-2xl font-bold">Meus agendamentos</h2>
+    </div>
+
+    <!-- Barra de pesquisa e filtros -->
+    <div class="flex flex-wrap gap-3 items-center mb-6">
+      <div class="relative flex-1">
+        <input type="text" placeholder="Buscar agendamentos..." class="w-full p-2 pl-10 border rounded-md">
+        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+        <button class="absolute right-3 top-2.5"><i class="fas fa-microphone text-gray-400"></i></button>
+      </div>
+      <select class="border rounded-md p-2">
+        <option>Status</option>
+      </select>
+      <select class="border rounded-md p-2">
+        <option>Tipo</option>
+      </select>
+      <select class="border rounded-md p-2">
+        <option>Especialidade</option>
+      </select>
+      <select class="border rounded-md p-2">
+        <option>UBS</option>
+      </select>
+      <button class="bg-gray-300 px-4 py-2 rounded-md">Filtrar por Período</button>
+    </div>
+
+    <!-- Cards de agendamento -->
+    <div class="grid md:grid-cols-2 gap-6">
+      {% for agendamento in agendamentos %}
+      <div class="bg-white rounded-lg shadow p-4 relative">
+        <!-- Ícone de status -->
+        {% if agendamento.status == 'Concluído' %}
+        <i class="fas fa-check-circle text-green-500 absolute top-4 right-4"></i>
+        {% elif agendamento.status == 'Pendente' %}
+        <i class="fas fa-clock text-yellow-500 absolute top-4 right-4"></i>
+        {% elif agendamento.status == 'Cancelado' %}
+        <i class="fas fa-times-circle text-red-500 absolute top-4 right-4"></i>
+        {% endif %}
+
+        <h3 class="text-xl font-bold mb-1">{{ agendamento.tipo }}</h3>
+        <p><strong>Especialidade:</strong> {{ agendamento.especialidade }}</p>
+        <p><strong>UBS:</strong> {{ agendamento.ubs }}</p>
+        <p><strong>Data:</strong> {{ agendamento.data }} às {{ agendamento.hora }}</p>
+        <p><strong>Status:</strong> {{ agendamento.status }}</p>
+        <p><strong>Protocolo:</strong> {{ agendamento.protocolo }}</p>
+
+        {% if agendamento.documentos %}
+        <a href="#" class="text-blue-600 text-sm inline-block mt-2"><i class="fas fa-paperclip"></i> {{ agendamento.documentos.0 }}{% if agendamento.documentos|length > 1 %} + documentos{% endif %}</a>
+        {% endif %}
+
+        <!-- Ações -->
+        <div class="flex flex-wrap gap-2 mt-4">
+          {% if agendamento.status == 'Pendente' %}
+          <button class="px-3 py-1 bg-gray-200 rounded">Remarcar</button>
+          <button class="px-3 py-1 bg-gray-200 rounded">Cancelar</button>
+          {% elif agendamento.status == 'Concluído' %}
+          <button class="px-3 py-1 bg-gray-200 rounded">Feedback</button>
+          {% elif agendamento.status == 'Cancelado' %}
+          <button class="px-3 py-1 bg-gray-200 rounded">Remarcar</button>
+          {% endif %}
+          <button class="px-3 py-1 bg-gray-200 rounded">Anexar Documentos</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+</body>
+
+</html>

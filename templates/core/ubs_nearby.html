@@ -1,1 +1,508 @@
-<h1 class="text-2xl text-center mt-10">UBSs Próximas (em construção)</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UBSs Próximas - FalaUBS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <!-- Top Bar -->
+    <header class="w-full bg-blue-700 text-white flex items-center justify-between px-4 py-3">
+        <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-semibold flex items-center space-x-2">
+                <i class="fas fa-hospital h-6"></i>
+                <span>Bem-vindo ao FalaUBS</span>
+            </h1>
+        </div>
+        <button aria-label="Menu" class="focus:outline-none">
+            <i class="fas fa-bars h-8"></i>
+        </button>
+    </header>
+    <div class="max-w-5xl mx-auto p-4">
+        <div class="flex items-center mb-6 space-x-4">
+            <button aria-label="Back" onclick="window.history.back()" class="focus:outline-none">
+                <i class="fas fa-arrow-left w-6 h-6"></i>
+            </button>
+            <h2 class="text-2xl font-semibold flex-1">UBSs Próximas</h2>
+        </div>
+        <div class="relative">
+            <div class="relative mb-6">
+                <input id="searchInput" type="text" placeholder="Pesquisar UBSs"
+                    class="w-full p-3 rounded-lg border border-blue-600 border-opacity-75 bg-gray-300 bg-opacity-60 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 pl-12 pr-12"
+                    onkeyup="filterUBS()" />
+                <i
+                    class="fas fa-search w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-black pointer-events-none"></i>
+                <button class="absolute right-4 top-1/2 transform -translate-y-1/2 focus:outline-none">
+                    <i class="fas fa-microphone w-5 h-5 text-black"></i>
+                </button>
+            </div>
+            <div class="flex justify-end mb-8">
+                <button id="filterButton"
+                    class="flex items-center space-x-2 px-3 py-1 rounded-lg bg-gray-300 bg-opacity-60 text-black border border-blue-600 border-opacity-75 focus:outline-none"
+                    onclick="toggleFilter()">
+                    <i class="fas fa-filter w-6 h-6"></i>
+                    <span class="hidden sm:inline">Filtro</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter modal -->
+        <div id="filterModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <h2 class="text-xl font-semibold mb-4">Filtros</h2>
+                <form id="filterForm" onsubmit="applyFilters(event)" class="space-y-4">
+                    <div>
+                        <label class="block font-semibold mb-1">Serviços</label>
+                        <select id="servicesFilter" multiple
+                            class="w-full border border-gray-300 rounded p-2 h-28 overflow-auto">
+                            {% for service in service_names %}
+                            <option>{{ service }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Vacinas Disponíveis</label>
+                        <select id="vaccinesFilter" multiple
+                            class="w-full border border-gray-300 rounded p-2 h-28 overflow-auto">
+                            {% for vaccine in vaccine_names %}
+                            <option>{{ vaccine }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Faixa de Horário</label>
+                        <input type="time" id="openTime" class="border border-gray-300 rounded p-2 w-full mb-2"
+                            placeholder="Aberto a partir de" />
+                        <input type="time" id="closeTime" class="border border-gray-300 rounded p-2 w-full"
+                            placeholder="Fechado até" />
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Acessibilidade</label>
+                        <div class="flex flex-col space-y-1">
+                            <label><input type="checkbox" class="accessibilityFilter" value="Acesso para cadeirantes" />
+                                Acesso para cadeirantes</label>
+                            <label><input type="checkbox" class="accessibilityFilter" value="Sinalização em Braille" />
+                                Sinalização em Braille</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Faixa Etária Atendida</label>
+                        <select id="ageGroupFilter" class="w-full border border-gray-300 rounded p-2">
+                            <option value="">Todas</option>
+                            <option value="Crianças">Crianças</option>
+                            <option value="Adultos">Adultos</option>
+                            <option value="Idosos">Idosos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Distância Máxima (km)</label>
+                        <input type="number" id="maxDistance" min="0" step="0.1"
+                            class="border border-gray-300 rounded p-2 w-full" placeholder="Ex: 5" />
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                            onclick="toggleFilter()">Cancelar</button>
+                        <button type="button" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                            onclick="clearFilters()">Limpar Filtros</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="ubsContainer" class="space-y-6">
+            {% for ubs in ubs_list %}
+            <div class="ubs-card bg-white rounded-2xl shadow p-4 relative transition-shadow hover:shadow-lg"
+                data-name="{{ ubs.name|lower }}" data-address="{{ ubs.address|lower }}"
+                data-district="{{ ubs.district|lower }}" data-services="{{ ubs.services|join:','|lower }}"
+                data-vaccines="{{ ubs.vaccines|join:','|lower }}"
+                data-accessibility="{{ ubs.accessibility|join:','|lower }}"
+                data-age-groups="{{ ubs.age_groups|join:','|lower }}" data-distance="{{ ubs.distance_km }}">
+                <div class="collapsed-view cursor-pointer p-2" onclick="toggleExpand(this)">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold">{{ ubs.name }}</h2>
+                        <button aria-label="Expand" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <img src="{% static 'icons/Icon_maximize.png' %}" alt="Expand Icon" class="w-5 h-5" />
+                        </button>
+                    </div>
+                    <div class="mt-2 space-y-2 text-gray-700">
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                            <div class="flex items-center space-x-2">
+                                <img src="{% static 'icons/Icon_address.png' %}" alt="Address Icon" class="w-5 h-5" />
+                                <p class="text-sm"><strong>Endereço:</strong> {{ ubs.address }}, {{ ubs.district }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <img src="{% static 'icons/Icon_hour.png' %}" alt="Hour Icon" class="w-5 h-5" />
+                                <p class="text-sm"><strong>Horário:</strong> {{ ubs.hours }}</p>
+                                <span
+                                    class="inline-block bg-green-100 text-green-800 text-xs font-semibold rounded-full px-2 py-1 ml-2">Aberto
+                                    agora</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <img src="{% static 'icons/Icon_telephone.png' %}" alt="Phone Icon" class="w-5 h-5" />
+                                <p class="text-sm"><strong>Telefone:</strong> {{ ubs.phone }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <img src="{% static 'icons/Icon_services.png' %}" alt="Services Icon" class="w-5 h-5" />
+                                <p class="truncate max-w-xs text-sm">
+                                    {% with ubs.services|slice:":3" as first_services %}
+                                    {{ first_services|join:", " }}
+                                    {% if ubs.services|length > 3 %}
+                                    <span class="text-blue-600 font-semibold cursor-pointer">+{{
+                                        ubs.services|length|add:"-3" }} mais</span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="expanded-view hidden mt-2 text-gray-700 relative">
+                    <div class="absolute top-2 right-2 flex items-center space-x-2">
+                        <a href="{% url 'ubs_detail' ubs.name %}"
+                            class="bg-[#2563EB] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md flex items-center space-x-2">
+                            <img src="{% static 'icons/Icon_forward.png' %}" alt="Visit" class="w-4 h-4 invert" />
+                            <span>Visitar</span>
+                        </a>
+                        <button aria-label="Collapse" class="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            onclick="toggleExpand(this)">
+                            <img src="{% static 'icons/Icon_minimize.png' %}" alt="Collapse Icon" class="w-6 h-6" />
+                        </button>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-2">{{ ubs.name }}</h2>
+                    <div class="mb-2 flex items-center space-x-2">
+                        <img src="{% static 'icons/Icon_address.png' %}" alt="Address Icon" class="w-5 h-5" />
+                        <p class="font-bold">Endereço:</p>
+                        <p>{{ ubs.address }}, {{ ubs.district }}</p>
+                    </div>
+                    <div class="mb-2 flex items-center space-x-2">
+                        <img src="{% static 'icons/Icon_hour.png' %}" alt="Hour Icon" class="w-5 h-5" />
+                        <p class="font-bold">Horário:</p>
+                        <p>{{ ubs.hours }}</p>
+                        <span
+                            class="inline-block bg-green-100 text-green-800 text-xs font-semibold rounded-full px-2 py-1 ml-2">Aberto
+                            agora</span>
+                    </div>
+                    <div class="mb-2 flex items-center space-x-2">
+                        <img src="{% static 'icons/Icon_telephone.png' %}" alt="Phone Icon" class="w-5 h-5" />
+                        <p class="font-bold">Telefone:</p>
+                        <p>{{ ubs.phone }}</p>
+                    </div>
+                    <div class="mb-2">
+                        <p class="font-bold mb-1">Vacinas Disponíveis</p>
+                        <div class="flex flex-wrap gap-1">
+                            {% for vaccine in ubs.vaccines %}
+                            <span
+                                class="bg-blue-100 text-blue-700 text-xs font-bold rounded-full px-2 py-0.5 shadow text-center">
+                                {{ vaccine }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <p class="font-bold mb-1">Serviços em Destaque</p>
+                        <div class="flex flex-wrap gap-1">
+                            {% for service in ubs.services %}
+                            <span
+                                class="bg-green-100 text-green-700 text-xs font-bold rounded-full px-2 py-0.5 shadow text-center">
+                                {{ service }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <p class="font-bold mb-1">Acessibilidade</p>
+                        <div class="flex flex-wrap gap-1">
+                            {% for acc in ubs.accessibility %}
+                            <span
+                                class="bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full px-2 py-0.5 shadow text-center">
+                                {{ acc }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <p><strong>Faixa Etária Atendida:</strong> {{ ubs.age_groups|join:", " }}</p>
+                    </div>
+                    <div>
+                        <p><strong>Distância:</strong> {{ ubs.distance_km }} km</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function toggleFilter() {
+            const modal = document.getElementById('filterModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function filterUBS() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.ubs-card');
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                const address = card.getAttribute('data-address');
+                const district = card.getAttribute('data-district');
+
+                if (name.includes(filter) || address.includes(filter) || district.includes(filter)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function applyFilters(event) {
+            event.preventDefault();
+
+            const servicesSelect = document.getElementById('servicesFilter');
+            const vaccinesSelect = document.getElementById('vaccinesFilter');
+            const openTime = document.getElementById('openTime').value;
+            const closeTime = document.getElementById('closeTime').value;
+            const accessibilityCheckboxes = document.querySelectorAll('.accessibilityFilter:checked');
+            const ageGroup = document.getElementById('ageGroupFilter').value;
+            const maxDistance = parseFloat(document.getElementById('maxDistance').value);
+
+            const selectedServices = Array.from(servicesSelect.selectedOptions).map(opt => opt.value.toLowerCase());
+            const selectedVaccines = Array.from(vaccinesSelect.selectedOptions).map(opt => opt.value.toLowerCase());
+            const selectedAccessibility = Array.from(accessibilityCheckboxes).map(cb => cb.value.toLowerCase());
+
+            const cards = document.querySelectorAll('.ubs-card');
+
+            cards.forEach(card => {
+                const cardServices = card.getAttribute('data-services').split(',');
+                const cardVaccines = card.getAttribute('data-vaccines').split(',');
+                const cardAccessibility = card.getAttribute('data-accessibility').split(',');
+                const cardAgeGroups = card.getAttribute('data-age-groups').split(',');
+                const cardDistance = parseFloat(card.getAttribute('data-distance'));
+
+                // Check services filter
+                const servicesMatch = selectedServices.length === 0 || selectedServices.every(s => cardServices.includes(s));
+                // Check vaccines filter
+                const vaccinesMatch = selectedVaccines.length === 0 || selectedVaccines.every(v => cardVaccines.includes(v));
+                // Check accessibility filter
+                const accessibilityMatch = selectedAccessibility.length === 0 || selectedAccessibility.every(a => cardAccessibility.includes(a));
+                // Check age group filter
+                const ageGroupMatch = !ageGroup || ageGroup === "" || cardAgeGroups.includes(ageGroup.toLowerCase());
+                // Check distance filter
+                const distanceMatch = isNaN(maxDistance) || cardDistance <= maxDistance;
+                // Check opening hours filter (basic check)
+                let openTimeMatch = true;
+                let closeTimeMatch = true;
+                if (openTime) {
+                    const cardOpen = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[1];
+                    openTimeMatch = cardOpen >= openTime;
+                }
+                if (closeTime) {
+                    const cardClose = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[3];
+                    closeTimeMatch = cardClose <= closeTime;
+                }
+
+                if (servicesMatch && vaccinesMatch && accessibilityMatch && ageGroupMatch && distanceMatch && openTimeMatch && closeTimeMatch) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            toggleFilter();
+        }
+
+        function clearFilters() {
+            const servicesSelect = document.getElementById('servicesFilter');
+            const vaccinesSelect = document.getElementById('vaccinesFilter');
+
+            // Clear multi-selects
+            for (let i = 0; i < servicesSelect.options.length; i++) {
+                servicesSelect.options[i].selected = false;
+            }
+            for (let i = 0; i < vaccinesSelect.options.length; i++) {
+                vaccinesSelect.options[i].selected = false;
+            }
+
+            document.getElementById('openTime').value = '';
+            document.getElementById('closeTime').value = '';
+            document.querySelectorAll('.accessibilityFilter').forEach(cb => cb.checked = false);
+            document.getElementById('ageGroupFilter').value = '';
+            document.getElementById('maxDistance').value = '';
+            document.getElementById('searchInput').value = '';
+
+            // Show all cards after clearing filters
+            const cards = document.querySelectorAll('.ubs-card');
+            cards.forEach(card => {
+                card.style.display = '';
+            });
+        }
+
+        function toggleExpand(element) {
+            const card = element.closest('.ubs-card');
+            const collapsedView = card.querySelector('.collapsed-view');
+            const expandedView = card.querySelector('.expanded-view');
+            const expandIcon = element.querySelector('button i');
+
+            if (expandedView.classList.contains('hidden')) {
+                expandedView.classList.remove('hidden');
+                collapsedView.classList.add('hidden');
+                if (expandIcon) {
+                    expandIcon.classList.remove('fa-arrow-up-right-from-square');
+                    expandIcon.classList.add('fa-arrow-down-left');
+                }
+            } else {
+                expandedView.classList.add('hidden');
+                collapsedView.classList.remove('hidden');
+                if (expandIcon) {
+                    expandIcon.classList.remove('fa-arrow-down-left');
+                    expandIcon.classList.add('fa-arrow-up-right-from-square');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
+<script>
+    function toggleFilter() {
+        const modal = document.getElementById('filterModal');
+        modal.classList.toggle('hidden');
+    }
+
+    function filterUBS() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const cards = document.querySelectorAll('.ubs-card');
+
+        cards.forEach(card => {
+            const name = card.getAttribute('data-name');
+            const address = card.getAttribute('data-address');
+            const district = card.getAttribute('data-district');
+
+            if (name.includes(filter) || address.includes(filter) || district.includes(filter)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function applyFilters(event) {
+        event.preventDefault();
+
+        const servicesSelect = document.getElementById('servicesFilter');
+        const vaccinesSelect = document.getElementById('vaccinesFilter');
+        const openTime = document.getElementById('openTime').value;
+        const closeTime = document.getElementById('closeTime').value;
+        const accessibilityCheckboxes = document.querySelectorAll('.accessibilityFilter:checked');
+        const ageGroup = document.getElementById('ageGroupFilter').value;
+        const maxDistance = parseFloat(document.getElementById('maxDistance').value);
+
+        const selectedServices = Array.from(servicesSelect.selectedOptions).map(opt => opt.value.toLowerCase());
+        const selectedVaccines = Array.from(vaccinesSelect.selectedOptions).map(opt => opt.value.toLowerCase());
+        const selectedAccessibility = Array.from(accessibilityCheckboxes).map(cb => cb.value.toLowerCase());
+
+        const cards = document.querySelectorAll('.ubs-card');
+
+        cards.forEach(card => {
+            const cardServices = card.getAttribute('data-services').split(',');
+            const cardVaccines = card.getAttribute('data-vaccines').split(',');
+            const cardAccessibility = card.getAttribute('data-accessibility').split(',');
+            const cardAgeGroups = card.getAttribute('data-age-groups').split(',');
+            const cardDistance = parseFloat(card.getAttribute('data-distance'));
+
+            // Check services filter
+            const servicesMatch = selectedServices.length === 0 || selectedServices.every(s => cardServices.includes(s));
+            // Check vaccines filter
+            const vaccinesMatch = selectedVaccines.length === 0 || selectedVaccines.every(v => cardVaccines.includes(v));
+            // Check accessibility filter
+            const accessibilityMatch = selectedAccessibility.length === 0 || selectedAccessibility.every(a => cardAccessibility.includes(a));
+            // Check age group filter
+            const ageGroupMatch = !ageGroup || ageGroup === "" || cardAgeGroups.includes(ageGroup.toLowerCase());
+            // Check distance filter
+            const distanceMatch = isNaN(maxDistance) || cardDistance <= maxDistance;
+            // Check opening hours filter (basic check)
+            let openTimeMatch = true;
+            let closeTimeMatch = true;
+            if (openTime) {
+                const cardOpen = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[1];
+                openTimeMatch = cardOpen >= openTime;
+            }
+            if (closeTime) {
+                const cardClose = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[3];
+                closeTimeMatch = cardClose <= closeTime;
+            }
+
+            if (servicesMatch && vaccinesMatch && accessibilityMatch && ageGroupMatch && distanceMatch && openTimeMatch && closeTimeMatch) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        toggleFilter();
+    }
+
+    function clearFilters() {
+        const servicesSelect = document.getElementById('servicesFilter');
+        const vaccinesSelect = document.getElementById('vaccinesFilter');
+
+        // Clear multi-selects
+        for (let i = 0; i < servicesSelect.options.length; i++) {
+            servicesSelect.options[i].selected = false;
+        }
+        for (let i = 0; i < vaccinesSelect.options.length; i++) {
+            vaccinesSelect.options[i].selected = false;
+        }
+
+        document.getElementById('openTime').value = '';
+        document.getElementById('closeTime').value = '';
+        document.querySelectorAll('.accessibilityFilter').forEach(cb => cb.checked = false);
+        document.getElementById('ageGroupFilter').value = '';
+        document.getElementById('maxDistance').value = '';
+        document.getElementById('searchInput').value = '';
+
+        // Show all cards after clearing filters
+        const cards = document.querySelectorAll('.ubs-card');
+        cards.forEach(card => {
+            card.style.display = '';
+        });
+    }
+
+    function toggleExpand(element) {
+        const card = element.closest('.ubs-card');
+        const collapsedView = card.querySelector('.collapsed-view');
+        const expandedView = card.querySelector('.expanded-view');
+        const expandIcon = element.querySelector('button i');
+
+        if (expandedView.classList.contains('hidden')) {
+            expandedView.classList.remove('hidden');
+            collapsedView.classList.add('hidden');
+            if (expandIcon) {
+                expandIcon.classList.remove('fa-arrow-up-right-from-square');
+                expandIcon.classList.add('fa-arrow-down-left');
+            }
+        } else {
+            expandedView.classList.add('hidden');
+            collapsedView.classList.remove('hidden');
+            if (expandIcon) {
+                expandIcon.classList.remove('fa-arrow-down-left');
+                expandIcon.classList.add('fa-arrow-up-right-from-square');
+            }
+        }
+    }
+</script>
+</body>
+
+</html>

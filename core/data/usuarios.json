@@ -1,0 +1,16 @@
+[
+    {
+        "cpf": "111.111.111-11",
+        "senha": "senha123",
+        "nome": "João Silva",
+        "idade": 35,
+        "tipo": "cidadao"
+    },
+    {
+        "cpf": "222.222.222-22",
+        "senha": "senha456",
+        "nome": "Maria Oliveira",
+        "idade": 28,
+        "tipo": "cidadao"
+    }
+]
