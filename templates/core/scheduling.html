@@ -42,9 +42,9 @@
     <div class="max-w-4xl mx-auto p-4">
         <!-- Back Button and Title -->
         <div class="flex items-center mb-6 space-x-4">
-            <button aria-label="Back" onclick="window.history.back()" class="focus:outline-none">
-                <i class="fas fa-arrow-left w-6 h-6"></i>
-            </button>
+            <a href="{% url 'home' %}" class="focus:outline-none">
+                <i class="fas fa-arrow-left"></i>
+            </a>
             <h2 class="text-2xl font-semibold">Agendamento</h2>
         </div>
 
@@ -60,23 +60,27 @@
 
         <!-- Form Content -->
         <div class="bg-white rounded-lg shadow-md p-6">
-            <form id="schedulingForm" class="space-y-6">
+            <form id="schedulingForm" method="post" action="{% url 'agenda_pessoal' %}" class="space-y-6">
+                {% csrf_token %}
+                <!-- guarda se é consulta ou exame, atualizado pelo seu JS -->
+                <input type="hidden" name="tipo" id="tipoInput" value="Consulta">
+
                 <!-- Specialty Selector (for Exame) -->
                 <div id="specialtySection" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Especialidade
                     </label>
-                    <select id="specialty" class="w-full p-2 border border-gray-300 rounded-md">
+                    <select id="specialty" name="especialidade" class="w-full p-2 border border-gray-300 rounded-md">
                         <option value="">Selecione uma especialidade</option>
                     </select>
                 </div>
 
-                <!-- Vaccine Selector (for Vacinação) -->
+                <!-- Vaccine Selector (para o caso de Vacinação) -->
                 <div id="vaccineSection" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Vacina
                     </label>
-                    <select id="vaccine" class="w-full p-2 border border-gray-300 rounded-md">
+                    <select id="vaccine" name="vacina" class="w-full p-2 border border-gray-300 rounded-md">
                         <option value="">Selecione uma vacina</option>
                     </select>
                 </div>
@@ -86,7 +90,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Unidade de Saúde (UBS)
                     </label>
-                    <select id="ubs" class="w-full p-2 border border-gray-300 rounded-md">
+                    <select id="ubs" name="ubs" class="w-full p-2 border border-gray-300 rounded-md">
                         <option value="">Selecione uma UBS</option>
                     </select>
                 </div>
@@ -97,19 +101,19 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Data
                         </label>
-                        <input type="date" id="date" class="w-full p-2 border border-gray-300 rounded-md">
+                        <input type="date" id="date" name="data" class="w-full p-2 border border-gray-300 rounded-md">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Horário
                         </label>
-                        <select id="time" class="w-full p-2 border border-gray-300 rounded-md">
+                        <select id="time" name="hora" class="w-full p-2 border border-gray-300 rounded-md">
                             <option value="">Selecione um horário</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Confirmation Section -->
+                <!-- Confirmation Section (sem alteração) -->
                 <div class="mt-8 p-4 bg-gray-50 rounded-lg">
                     <h3 class="text-lg font-semibold mb-4">Confirmação</h3>
                     <div class="space-y-2">
@@ -132,6 +136,7 @@
                 </button>
             </form>
         </div>
+
     </div>
 
     <script>
@@ -199,6 +204,7 @@
                 exame: 'Exame'
             };
             document.getElementById('appointmentType').textContent = types[tab];
+            document.getElementById('tipoInput').value = types[tab];
 
             currentTab = tab;
             updateUBSOptions(ubsData);
@@ -299,7 +305,7 @@
         // Event Listeners
         document.getElementById('specialty').addEventListener('change', () => {
             document.getElementById('specialtyValue').textContent = document.getElementById('specialty').value || '-';
-            updateUBSOptions(ubsData);  
+            updateUBSOptions(ubsData);
             updateTimeSlots(ubsData);   // manter para atualizar os horários
         });
 
@@ -383,8 +389,11 @@
 
         // Fix initial UBS dropdown load issue by calling updateUBSOptions on DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
+            // Valor inicial do hidden
+            document.getElementById('tipoInput').value = 'Consulta';
+
             switchTab('consulta', true, ubsData);
-            updateUBSOptions(ubsData); // Force initialization
+            updateUBSOptions(ubsData);
             updateTimeSlots(ubsData);
         });
 
@@ -398,8 +407,6 @@
         });
 
         document.getElementById('schedulingForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Here you would typically send the form data to the server
             alert('Agendamento realizado com sucesso!');
         });
 

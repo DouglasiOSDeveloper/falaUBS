@@ -22,37 +22,89 @@
 
   <main class="max-w-6xl mx-auto p-6">
     <div class="flex items-center space-x-4 mb-6">
-      <button onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+      <a href="{% url 'home' %}" class="focus:outline-none">
+        <i class="fas fa-arrow-left"></i>
+      </a>
       <h2 class="text-2xl font-bold">Meus agendamentos</h2>
     </div>
 
     <!-- Barra de pesquisa e filtros -->
-    <div class="flex flex-wrap gap-3 items-center mb-6">
-      <div class="relative flex-1">
-        <input type="text" placeholder="Buscar agendamentos..." class="w-full p-2 pl-10 border rounded-md">
+    <form method="get" class="space-y-4 mb-6">
+
+      <!-- 1) Campo de busca livre -->
+      <div class="relative">
+        <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar agendamentos..."
+          class="w-full p-2 pl-10 border rounded-md" />
         <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-        <button class="absolute right-3 top-2.5"><i class="fas fa-microphone text-gray-400"></i></button>
       </div>
-      <select class="border rounded-md p-2">
-        <option>Status</option>
-      </select>
-      <select class="border rounded-md p-2">
-        <option>Tipo</option>
-      </select>
-      <select class="border rounded-md p-2">
-        <option>Especialidade</option>
-      </select>
-      <select class="border rounded-md p-2">
-        <option>UBS</option>
-      </select>
-      <button class="bg-gray-300 px-4 py-2 rounded-md">Filtrar por Período</button>
-    </div>
+
+      <!-- 2) Dropdowns de filtro -->
+      <div class="flex flex-wrap gap-3">
+        <select name="status" class="border rounded-md p-2">
+          <option value="">Status</option>
+          {% for status in status_choices %}
+          <option value="{{ status }}" {% if filter_status == status %}selected{% endif %}>
+            {{ status }}
+          </option>
+          {% endfor %}
+        </select>
+
+        <select name="tipo" class="border rounded-md p-2">
+          <option value="">Tipo</option>
+          {% for t in tipo_choices %}
+          <option value="{{ t }}" {% if filter_tipo == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+
+        <select name="especialidade" class="border rounded-md p-2">
+          <option value="">Especialidade</option>
+          {% for esp in espec_choices %}
+          <option value="{{ esp }}" {% if filter_especialidade == esp %}selected{% endif %}>
+            {{ esp }}
+          </option>
+          {% endfor %}
+        </select>
+
+        <select name="ubs" class="border rounded-md p-2">
+          <option value="">UBS</option>
+          {% for u in ubs_choices %}
+          <option value="{{ u }}" {% if filter_ubs == u %}selected{% endif %}>{{ u }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- 3) Período com labels “De” e “Até” -->
+      <div class="flex items-end gap-4">
+        <div class="flex flex-col">
+          <label class="text-sm font-medium">De</label>
+          <input type="date" name="date_from" value="{{ filter_date_from }}" class="p-2 border rounded-md" />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-sm font-medium">Até</label>
+          <input type="date" name="date_to" value="{{ filter_date_to }}" class="p-2 border rounded-md" />
+        </div>
+      </div>
+
+      <!-- 4) Botões de Ações -->
+      <div class="flex gap-3">
+        <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition">
+          Aplicar
+        </button>
+        <a href="{% url 'agenda_pessoal' %}"
+          class="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400 transition">
+          Limpar
+        </a>
+      </div>
+
+    </form>
+
+
 
     <!-- Cards de agendamento -->
     <div class="grid md:grid-cols-2 gap-6">
       {% for agendamento in agendamentos %}
-      <div class="bg-white rounded-lg shadow p-4 relative">
-        <!-- Ícone de status -->
+      <div class="bg-white rounded-lg shadow p-4 relative" data-protocol="{{ agendamento.protocolo }}"
+        data-ubs="{{ agendamento.ubs }}" data-especialidade="{{ agendamento.especialidade }}">
         {% if agendamento.status == 'Concluído' %}
         <i class="fas fa-check-circle text-green-500 absolute top-4 right-4"></i>
         {% elif agendamento.status == 'Pendente' %}
@@ -68,26 +120,307 @@
         <p><strong>Status:</strong> {{ agendamento.status }}</p>
         <p><strong>Protocolo:</strong> {{ agendamento.protocolo }}</p>
 
-        {% if agendamento.documentos %}
-        <a href="#" class="text-blue-600 text-sm inline-block mt-2"><i class="fas fa-paperclip"></i> {{ agendamento.documentos.0 }}{% if agendamento.documentos|length > 1 %} + documentos{% endif %}</a>
-        {% endif %}
-
-        <!-- Ações -->
         <div class="flex flex-wrap gap-2 mt-4">
           {% if agendamento.status == 'Pendente' %}
-          <button class="px-3 py-1 bg-gray-200 rounded">Remarcar</button>
-          <button class="px-3 py-1 bg-gray-200 rounded">Cancelar</button>
+          <button onclick="openRescheduleModal('{{ agendamento.protocolo }}')"
+            class="px-3 py-1 bg-gray-200 rounded">Remarcar</button>
+          <button onclick="openCancelModal('{{ agendamento.protocolo }}')"
+            class="px-3 py-1 bg-gray-200 rounded">Cancelar</button>
           {% elif agendamento.status == 'Concluído' %}
-          <button class="px-3 py-1 bg-gray-200 rounded">Feedback</button>
+          <button onclick="openFeedbackModal('{{ agendamento.protocolo }}')"
+            class="px-3 py-1 bg-gray-200 rounded">Feedback</button>
           {% elif agendamento.status == 'Cancelado' %}
-          <button class="px-3 py-1 bg-gray-200 rounded">Remarcar</button>
+          <button onclick="openRescheduleModal('{{ agendamento.protocolo }}')"
+            class="px-3 py-1 bg-gray-200 rounded">Remarcar</button>
           {% endif %}
-          <button class="px-3 py-1 bg-gray-200 rounded">Anexar Documentos</button>
         </div>
       </div>
+      {% empty %}
+      <p class="text-center text-gray-500">Nenhum agendamento encontrado.</p>
       {% endfor %}
     </div>
   </main>
-</body>
+
+  <!-- Modal de Feedback -->
+  <div id="feedbackModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Feedback do Atendimento</h3>
+        <button onclick="closeFeedbackModal()" class="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+      </div>
+      <div class="flex justify-center gap-3 mb-4 text-3xl">
+        <span class="cursor-pointer hover:scale-110 transition" onclick="selectRating(1)">😡</span>
+        <span class="cursor-pointer hover:scale-110 transition" onclick="selectRating(2)">😟</span>
+        <span class="cursor-pointer hover:scale-110 transition" onclick="selectRating(3)">😐</span>
+        <span class="cursor-pointer hover:scale-110 transition" onclick="selectRating(4)">🙂</span>
+        <span class="cursor-pointer hover:scale-110 transition" onclick="selectRating(5)">😃</span>
+        <span class="cursor-pointer hover:scale-110 transition" onclick="selectRating(6)">😍</span>
+      </div>
+      <input type="hidden" id="selectedRating" />
+      <textarea id="feedbackComment" class="w-full p-2 border border-gray-300 rounded mb-4"
+        placeholder="Comentário (opcional)"></textarea>
+      <button onclick="submitFeedback()"
+        class="w-full py-2 bg-blue-700 text-white font-semibold rounded hover:bg-blue-800 transition">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Modal de Remarcar -->
+  <div id="rescheduleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <form method="post" action="{% url 'agenda_pessoal' %}" class="bg-white rounded-lg p-6 w-full max-w-lg space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="reschedule">
+      <input type="hidden" name="protocol" id="rescheduleProtocol" value="">
+
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Remarcar Agendamento</h3>
+        <button type="button" onclick="closeRescheduleModal()"
+          class="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+      </div>
+
+      <!-- UBS e Especialidade fixos -->
+      <p><strong>UBS:</strong> <span id="rescheduleUbsValue"></span></p>
+      <p><strong>Especialidade:</strong> <span id="rescheduleSpecValue"></span></p>
+
+      <!-- Data e horário -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+          <input type="date" name="new_date" id="rescheduleDate" class="w-full p-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Horário</label>
+          <select name="new_time" id="rescheduleTime" class="w-full p-2 border rounded">
+            <option value="">Selecione o horário</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit"
+        class="w-full py-2 bg-blue-700 text-white font-semibold rounded hover:bg-blue-800 transition">
+        Confirmar
+      </button>
+    </form>
+  </div>
+
+  <!-- Modal de Cancelar -->
+  <div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <form method="post" action="{% url 'agenda_pessoal' %}" class="bg-white rounded-lg p-6 w-full max-w-md space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="cancel">
+      <input type="hidden" name="protocol" id="cancelProtocol" value="">
+
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-xl font-semibold">Cancelar Agendamento</h3>
+        <button type="button" onclick="closeCancelModal()"
+          class="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+      </div>
+
+      <p class="mb-4">Tem certeza que deseja cancelar este agendamento?</p>
+      <p class="text-sm text-red-600 mb-6">
+        • UBS será notificada caso falte menos de 2 horas para o horário agendado.
+      </p>
+
+      <div class="flex gap-4">
+        <button type="submit"
+          class="flex-1 py-2 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition">
+          Confirmar Cancelamento
+        </button>
+        <button type="button" onclick="closeCancelModal()"
+          class="flex-1 py-2 bg-gray-200 text-black font-semibold rounded hover:bg-gray-300 transition">
+          Voltar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <body class="bg-gray-100">
+    <script>
+      // já vem do Django
+      const ubsData = JSON.parse('{{ ubs_data|escapejs }}');
+      let currentProtocol = null;
+
+      // --- Modal de Remarcar --------------------------------
+      // Popula o <select id="rescheduleUBS"> filtrando por especialidade, ou mostra todas
+      function populateUBS(specialty = '') {
+        const ubsSelect = document.getElementById('rescheduleUBS');
+        const previous = ubsSelect.value;
+        ubsSelect.innerHTML = '<option value="">Selecione a UBS</option>';
+        ubsData.ubsList.forEach(u => {
+          if (!specialty || u.services.includes(specialty)) {
+            const opt = document.createElement('option');
+            opt.value = u.name;
+            opt.textContent = u.name;
+            ubsSelect.appendChild(opt);
+          }
+        });
+        // restaura seleção se ainda existir
+        if ([...ubsSelect.options].some(o => o.value === previous)) {
+          ubsSelect.value = previous;
+        }
+      }
+
+      // Popula o <select id="rescheduleSpecialty"> filtrando por UBS, ou mostra todas
+      function populateSpecialty(ubsName = '') {
+        const specSelect = document.getElementById('rescheduleSpecialty');
+        const previous = specSelect.value;
+        specSelect.innerHTML = '<option value="">Selecione a especialidade</option>';
+        let list = [];
+        if (ubsName) {
+          const u = ubsData.ubsList.find(x => x.name === ubsName);
+          list = u ? u.services : [];
+        } else {
+          const set = new Set();
+          ubsData.ubsList.forEach(x => x.services.forEach(s => set.add(s)));
+          list = Array.from(set).sort();
+        }
+        list.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = s;
+          specSelect.appendChild(opt);
+        });
+        if ([...specSelect.options].some(o => o.value === previous)) {
+          specSelect.value = previous;
+        }
+      }
+
+      // Popula o <select id="rescheduleTime"> com blocos de 1h, baseado em openingHours e na data
+      function populateTime() {
+        const ubsName = document.getElementById('rescheduleUBS').value;
+        const date = document.getElementById('rescheduleDate').value;
+        const timeSelect = document.getElementById('rescheduleTime');
+        timeSelect.innerHTML = '<option value="">Selecione o horário</option>';
+        if (!ubsName || !date) return;
+        const u = ubsData.ubsList.find(x => x.name === ubsName);
+        if (!u || !u.openingHours) return;
+        const [openStr, closeStr] = u.openingHours.split(' - ');
+        const [oh, om] = openStr.split(':').map(Number);
+        const [ch, cm] = closeStr.split(':').map(Number);
+        const lastHour = cm === 0 ? ch - 1 : ch;
+        for (let h = oh; h <= lastHour; h++) {
+          const t = String(h).padStart(2, '0') + ':00';
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          timeSelect.appendChild(opt);
+        }
+      }
+
+      // --- Cancelamento ---
+      function openCancelModal(proto) {
+        currentProtocol = proto;
+        // carrega o protocolo no form
+        document.getElementById('cancelProtocol').value = proto;
+        document.getElementById('cancelModal').classList.remove('hidden');
+      }
+      function closeCancelModal() {
+        document.getElementById('cancelModal').classList.add('hidden');
+      }
+      function submitCancel() {
+        console.log(`Cancelado agendamento ${currentCancelProtocol}`);
+        alert('Agendamento cancelado com sucesso!');
+
+        // Atualiza dinamicamente o card
+        const card = document.querySelector(`[data-protocol="${currentCancelProtocol}"]`);
+        if (card) {
+          // 1) troca o ícone
+          const oldIcon = card.querySelector('i.absolute');
+          if (oldIcon) oldIcon.remove();
+          const icon = document.createElement('i');
+          icon.className = 'fas fa-times-circle text-red-500 absolute top-4 right-4';
+          card.appendChild(icon);
+
+          // 2) atualiza o Status:
+          const statusP = Array.from(card.querySelectorAll('p'))
+            .find(p => p.textContent.trim().startsWith('Status:'));
+          if (statusP) statusP.innerHTML = '<strong>Status:</strong> Cancelado';
+
+          // 3) troca os botões de ação:
+          const actions = card.querySelector('div.flex.flex-wrap');
+          actions.innerHTML = `
+        <button onclick="openRescheduleModal('${currentCancelProtocol}')"
+                class="px-3 py-1 bg-gray-200 rounded">Remarcar</button>
+        <button class="px-3 py-1 bg-gray-200 rounded">Anexar Documentos</button>
+      `;
+        }
+
+        closeCancelModal();
+      }
+
+      // Gera os horários de 1 em 1h com base no openingHours da UBS fixa
+      function populateRescheduleTime() {
+        const ubsName = document.getElementById('rescheduleUbsValue').textContent;
+        const date = document.getElementById('rescheduleDate').value;
+        const timeSelect = document.getElementById('rescheduleTime');
+        timeSelect.innerHTML = '<option value="">Selecione o horário</option>';
+        if (!ubsName || !date) return;
+
+        const u = ubsData.ubsList.find(x => x.name === ubsName);
+        if (!u || !u.openingHours) return;
+
+        const [openStr, closeStr] = u.openingHours.split(' - ');
+        const [oh] = openStr.split(':').map(Number);
+        const [ch, cm] = closeStr.split(':').map(Number);
+        const lastHour = cm === 0 ? ch - 1 : ch;
+
+        for (let h = oh; h <= lastHour; h++) {
+          const timeStr = String(h).padStart(2, '0') + ':00';
+          const opt = document.createElement('option');
+          opt.value = timeStr;
+          opt.textContent = timeStr;
+          timeSelect.appendChild(opt);
+        }
+      }
+
+      function openRescheduleModal(proto) {
+        currentProtocol = proto;
+        // preenche o hidden do form
+        document.getElementById('rescheduleProtocol').value = proto;
+
+        // pega card para extrair UBS e especialidade
+        const card = document.querySelector(`[data-protocol="${proto}"]`);
+        document.getElementById('rescheduleUbsValue').textContent = card.dataset.ubs;
+        document.getElementById('rescheduleSpecValue').textContent = card.dataset.especialidade;
+
+        // reseta data/hora
+        document.getElementById('rescheduleDate').value = '';
+        document.getElementById('rescheduleTime').innerHTML =
+          '<option value="">Selecione o horário</option>';
+
+        document.getElementById('rescheduleModal').classList.remove('hidden');
+      }
+
+      function closeRescheduleModal() {
+        document.getElementById('rescheduleModal').classList.add('hidden');
+      }
+
+      function submitReschedule() {
+        const ubs = document.getElementById('rescheduleUBS').value;
+        const spec = document.getElementById('rescheduleSpecialty').value;
+        const date = document.getElementById('rescheduleDate').value;
+        const time = document.getElementById('rescheduleTime').value;
+        if (!ubs || !spec || !date || !time) {
+          alert('Preencha todos os campos para remarcar.');
+          return;
+        }
+        console.log(`Remarcado: ${currentProtocol} | UBS: ${ubs}, Esp: ${spec}, Data: ${date}, Hora: ${time}`);
+        alert('Agendamento remarcado com sucesso!');
+        closeRescheduleModal();
+      }
+
+      // --- Event listeners iniciais -------------------------
+      document.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('rescheduleDate');
+        dateInput.addEventListener('change', populateRescheduleTime);
+      });
+
+      // --- Feedback (inalterado) ----------------------------
+      let currentProtocolFeedback = null;
+      function openFeedbackModal(protocolo) { /* ... */ }
+      function closeFeedbackModal() { /* ... */ }
+      function selectRating(r) { /* ... */ }
+      function submitFeedback() { /* ... */ }
+    </script>
+  </body>
 
 </html>
