@@ -1,76 +1,36 @@
+import json
+import os
 from django.shortcuts import render, redirect
+from pathlib import Path
+from django.conf import settings
 
-# Mocks de usuários
-MOCK_USERS = [
-    {
-        'cpf': '111.111.111-11',
-        'senha': 'senha123',
-        'nome': 'João Silva',
-        'idade': 35,
-        'tipo': 'cidadao'
-    },
-    {
-        'cpf': '222.222.222-22',
-        'senha': 'senha456',
-        'nome': 'Maria Oliveira',
-        'idade': 28,
-        'tipo': 'cidadao'
-    }
-]
+# Mocks de usuários JSON
+def carregar_usuarios_mock():
+    path = os.path.join(settings.BASE_DIR, 'core', 'data', 'usuarios.json')
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)
 
-MOCK_PROFISSIONAIS = [
-    {
-        'cpf': '333.333.333-33',
-        'senha': 'prof123',
-        'nome': 'Dr. Carlos Mendes',
-        'ubs': 'UBS Central',
-        'tipo': 'profissional'
-    },
-    {
-        'cpf': '444.444.444-44',
-        'senha': 'prof456',
-        'nome': 'Enf. Ana Costa',
-        'ubs': 'UBS Norte',
-        'tipo': 'profissional'
-    }
-]
-
-# Dados mockados
-mock_vaccines = [
-    {
-        "name": "Hepatite B",
-        "description": "Protege contra a hepatite B",
-        "age_group": "Criança, Adulto",
-        "status": "Disponível",
-        "unit": "UBS Central",
-        "scheduling": "Agendamento necessário"
-    },
-    {
-        "name": "Tríplice Viral",
-        "description": "Contra sarampo, caxumba e rubéola",
-        "age_group": "Criança, Adolescente",
-        "status": "Disponível",
-        "unit": "UBS Sul",
-        "scheduling": "Livre demanda"
-    },
-    # Pode adicionar mais mockados aqui se quiser
-]
+# Mocks de profissionais JSON
+def carregar_profissionais_mock():
+    path = os.path.join(settings.BASE_DIR, 'core', 'data', 'profissionais.json')
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)
 
 # Página de Login
 def login_view(request):
     if request.method == 'POST':
         cpf = request.POST.get('cpf')
         senha = request.POST.get('senha')
-        codigo = request.POST.get('codigo')  # não será usado agora
 
-        # Verifica cidadão
-        for user in MOCK_USERS:
+        usuarios = carregar_usuarios_mock()
+        profissionais = carregar_profissionais_mock()
+
+        for user in usuarios:
             if user['cpf'] == cpf and user['senha'] == senha:
                 request.session['usuario'] = user
                 return redirect('home')
 
-        # Verifica profissional
-        for prof in MOCK_PROFISSIONAIS:
+        for prof in profissionais:
             if prof['cpf'] == cpf and prof['senha'] == senha:
                 request.session['usuario'] = prof
                 return redirect('home')
@@ -88,19 +48,144 @@ def home_view(request):
 
 # Página de Vacinação
 def vaccination_view(request):
-    return render(request, 'core/vaccination.html', {'vaccines': mock_vaccines})
+    json_path = os.path.join(settings.BASE_DIR, 'core', 'data', 'ubs_data.json')
+
+    with open(json_path, 'r', encoding='utf-8') as file:
+        ubs_data = json.load(file)
+
+    vaccines = []
+    for ubs in ubs_data.get("ubsList", []):
+        for vaccine in ubs.get("vaccines", []):
+            # Mapeia o campo corretamente
+            vaccines.append({
+                "name": vaccine["name"],
+                "description": vaccine["description"],
+                "age_group": vaccine["ageGroup"],  # <-- esse é o ponto importante
+                "status": vaccine["status"],
+                "scheduling": vaccine["scheduling"],
+                "unit": vaccine["unit"]
+            })
+
+    return render(request, 'core/vaccination.html', {'vaccines': vaccines})
+
 
 # Página de Agendamento
 def scheduling_view(request):
-    return render(request, 'core/scheduling.html')
+    user_data = request.session.get('usuario')
+    if not user_data:
+        return redirect('login')  # Garantir autenticação
+
+    # Carrega dados das UBSs
+    json_path = os.path.join(settings.BASE_DIR, 'core', 'data', 'ubs_data.json')
+    with open(json_path, 'r', encoding='utf-8') as file:
+        ubs_data = json.load(file)
+
+    # Serializa para string JSON segura
+    ubs_data_json = json.dumps(ubs_data, ensure_ascii=False)
+
+    return render(request, 'core/scheduling.html', {
+        'ubs_data': ubs_data_json,
+        'user_data': user_data
+    })
+
 
 # Página de UBS Próximas
 def ubs_nearby_view(request):
-    return render(request, 'core/ubs_nearby.html')
+    json_path = os.path.join(settings.BASE_DIR, 'core', 'data', 'ubs_data.json')
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    ubs_list = []
+    for ubs in data.get('ubsList', []):
+        ubs_list.append({
+            'name': ubs['name'],
+            'address': ubs['address'],
+            'district': ubs.get('district', 'Centro'),
+            'phone': ubs['phone'],
+            'hours': ubs['openingHours'],
+            'services': ubs['services'],
+            'vaccines': [v['name'] for v in ubs['vaccines']],
+            'accessibility': ubs['accessibility'],
+            'age_groups': list({v['ageGroup'] for v in ubs['vaccines']}),
+            'distance_km': 1.2
+        })
+
+    # EXTRAÇÃO FORA DO LOOP
+    vaccine_names = sorted({
+        v['name']
+        for ubs in data.get('ubsList', [])
+        for v in ubs.get('vaccines', [])
+    })
+
+    service_names = sorted({
+        s
+        for ubs in data.get('ubsList', [])
+        for s in ubs.get('services', [])
+    })
+
+    return render(request, 'core/ubs_nearby.html', {
+        'ubs_list': ubs_list,
+        'vaccine_names': vaccine_names,
+        'service_names': service_names
+    })
 
 # Página de UBS Específica
 def ubs_detail_view(request, ubs_name):
-    context = {
-        'ubs_name': ubs_name
-    }
-    return render(request, 'core/ubs_detail.html', context)
+    data = load_mock_ubs_data()
+    ubs = next((u for u in data['ubsList'] if u['name'] == ubs_name), None)
+
+    if not ubs:
+        return render(request, 'core/ubs_detail.html', {'ubs': None})
+
+    return render(request, 'core/ubs_detail.html', {'ubs': ubs})
+
+#Load dos dados mockados das UBSs
+def load_mock_ubs_data():
+    file_path = Path(__file__).resolve().parent / 'data' / 'ubs_data.json'
+    with open(file_path, encoding='utf-8') as f:
+        return json.load(f)
+
+# Página de Agenda Pessoal
+def personal_schedule_view(request):
+    user = request.session.get('usuario')
+    if not user:
+        return redirect('login')
+
+    # MOCK de agendamentos apenas para exibição inicial
+    agendamentos_mock = [
+        {
+            'tipo': 'Consulta',
+            'especialidade': 'Pediatra',
+            'ubs': 'UBS Norte',
+            'data': '2025-06-19',
+            'hora': '09:00',
+            'status': 'Pendente',
+            'protocolo': 'ANP685',
+            'documentos': ['laudo_exame.pdf']
+        },
+        {
+            'tipo': 'Exame',
+            'especialidade': 'Ginecologia',
+            'ubs': 'UBS Central',
+            'data': '2025-05-25',
+            'hora': '11:00',
+            'status': 'Concluído',
+            'protocolo': 'VYYG85',
+            'documentos': []
+        },
+        {
+            'tipo': 'Consulta',
+            'especialidade': 'Clínico geral',
+            'ubs': 'UBS Central',
+            'data': '2025-05-10',
+            'hora': '08:00',
+            'status': 'Cancelado',
+            'protocolo': 'JYCG8',
+            'documentos': []
+        }
+    ]
+
+    return render(request, 'core/agenda_pessoal.html', {
+        'usuario': user,
+        'agendamentos': agendamentos_mock
+    })

@@ -1,0 +1,150 @@
+{
+  "ubsList": [
+    {
+      "name": "UBS Central",
+      "address": "Rua Principal, 123, Centro",
+      "openingHours": "08:00 - 17:00",
+      "phone": "(61) 1234-5678",
+      "vaccines": [
+        {
+          "name": "BCG",
+          "description": "Previne contra formas graves de tuberculose",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Central"
+        },
+        {
+          "name": "Pentavalente",
+          "description": "Protege contra difteria, tétano, coqueluche, hepatite B e Haemophilus influenzae B",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Central"
+        },
+        {
+          "name": "Poliomielite",
+          "description": "Previne contra a paralisia infantil",
+          "ageGroup": "Criança",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Central"
+        }
+      ],
+      "services": ["Consulta Geral", "Pediatria", "Vacinação"],
+      "accessibility": ["Acesso para cadeirantes", "Sinalização em Braille"]
+    },
+    {
+      "name": "UBS Vila Nova",
+      "address": "Avenida das Flores, 456, Vila Nova",
+      "openingHours": "07:00 - 16:00",
+      "phone": "(61) 2345-6789",
+      "vaccines": [
+        {
+          "name": "HPV",
+          "description": "Previne contra o papilomavírus humano",
+          "ageGroup": "Adolescente",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Vila Nova"
+        },
+        {
+          "name": "Meningocócica ACWY",
+          "description": "Protege contra meningite e infecções generalizadas",
+          "ageGroup": "Adolescente",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Vila Nova"
+        }
+      ],
+      "services": ["Clínica Geral", "Ginecologia", "Vacinação"],
+      "accessibility": ["Acesso para cadeirantes"]
+    },
+    {
+      "name": "UBS Jardim América",
+      "address": "Rua dos Ipês, 789, Jardim América",
+      "openingHours": "08:00 - 18:00",
+      "phone": "(61) 3456-7890",
+      "vaccines": [
+        {
+          "name": "Dupla Adulto",
+          "description": "Protege contra difteria e tétano",
+          "ageGroup": "Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Jardim América"
+        },
+        {
+          "name": "Hepatite B",
+          "description": "Previne contra hepatite B",
+          "ageGroup": "Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Jardim América"
+        },
+        {
+          "name": "Febre Amarela",
+          "description": "Previne contra febre amarela",
+          "ageGroup": "Adulto,Idoso",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Jardim América"
+        }
+      ],
+      "services": ["Clínica Geral", "Odontologia", "Vacinação"],
+      "accessibility": ["Acesso para cadeirantes", "Sinalização em Braille", "Intérprete de Libras"]
+    },
+    {
+      "name": "UBS Parque Verde",
+      "address": "Alameda dos Pinheiros, 321, Parque Verde",
+      "openingHours": "07:30 - 17:30",
+      "phone": "(61) 4567-8901",
+      "vaccines": [
+        {
+          "name": "dTpa",
+          "description": "Protege contra difteria, tétano e coqueluche",
+          "ageGroup": "Gestante",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Parque Verde"
+        },
+        {
+          "name": "Influenza",
+          "description": "Previne contra gripe",
+          "ageGroup": "Gestante,Idoso",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Parque Verde"
+        }
+      ],
+      "services": ["Pré-natal", "Vacinação", "Acompanhamento gestacional"],
+      "accessibility": ["Acesso para cadeirantes", "Estacionamento preferencial"]
+    },
+    {
+      "name": "UBS São José",
+      "address": "Rua das Palmeiras, 654, São José",
+      "openingHours": "08:00 - 17:00",
+      "phone": "(61) 5678-9012",
+      "vaccines": [
+        {
+          "name": "Pneumocócica 23",
+          "description": "Previne contra pneumonia e outras infecções",
+          "ageGroup": "Idoso",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS São José"
+        },
+        {
+          "name": "Herpes Zóster",
+          "description": "Previne contra herpes zóster",
+          "ageGroup": "Idoso",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS São José"
+        }
+      ],
+      "services": ["Geriatria", "Vacinação", "Fisioterapia"],
+      "accessibility": ["Acesso para cadeirantes", "Piso tátil", "Sinalização em Braille"]
+    }
+  ]
+}

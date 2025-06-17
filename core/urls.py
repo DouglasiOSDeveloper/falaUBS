@@ -8,4 +8,5 @@ urlpatterns = [
     path('scheduling/', views.scheduling_view, name='scheduling'),
     path('ubs-nearby/', views.ubs_nearby_view, name='ubs_nearby'),
     path('ubs-detail/<str:ubs_name>/', views.ubs_detail_view, name='ubs_detail'),
+    path('agenda/', views.personal_schedule_view, name='agenda_pessoal'),
 ]
