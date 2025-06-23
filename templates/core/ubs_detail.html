@@ -1,39 +1,26 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ ubs.name }} - FalaUBS</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS do Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <style>
+        /* Container genérico, sem height fixo */
         .map-container {
             width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #f8fafc 25%, #f1f5f9 25%, #f1f5f9 50%, #f8fafc 50%, #f8fafc 75%, #f1f5f9 75%, #f1f5f9);
-            background-size: 32px 32px;
-            border-radius: 1rem;
             position: relative;
             overflow: hidden;
+            border-radius: 0.75rem;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
-        .map-pin {
-            width: 48px;
-            height: 48px;
-            background-color: #2563EB;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        /* Remover qualquer background do leaflet */
+        .leaflet-container {
+            background: none !important;
         }
-
         .service-card {
             background-color: rgba(37, 99, 235, 0.24);
             border-radius: 1.5rem;
@@ -45,36 +32,21 @@
             box-shadow: 0 4px 6px rgba(37, 99, 235, 0.08);
             transition: all 0.2s ease-in-out;
         }
-
         .service-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(37, 99, 235, 0.12);
         }
-
         .service-card img {
             width: 56px;
             height: 56px;
             margin-bottom: 1.25rem;
             transition: transform 0.2s ease;
         }
-
         .service-card:hover img {
             transform: scale(1.05);
         }
-
-        @media (min-width: 768px) {
-            .button-container {
-                display: flex;
-                gap: 1rem;
-            }
-
-            .button-container button {
-                flex: 1;
-            }
-        }
     </style>
 </head>
-
 <body class="bg-gray-100 min-h-screen">
     <header class="w-full bg-blue-700 text-white flex items-center justify-between px-4 py-3">
         <h1 class="text-lg font-semibold flex items-center space-x-2">
@@ -99,19 +71,19 @@
         <div class="mb-8 space-y-4">
             <p class="flex items-center text-gray-700">
                 <img src="{% static 'icons/Icon_location.png' %}" alt="Location" class="w-3 h-3 mr-3" />
-                <span><span class="font-bold">Endereço:</span> {{ ubs.address }}</span>
+                <span><strong>Endereço:</strong> {{ ubs.address }}</span>
             </p>
             <p class="flex items-center text-gray-700">
                 <img src="{% static 'icons/Icon_telephone.png' %}" alt="Phone" class="w-3 h-3 mr-3" />
-                <span><span class="font-bold">Telefone:</span> {{ ubs.phone }}</span>
+                <span><strong>Telefone:</strong> {{ ubs.phone }}</span>
             </p>
             <p class="flex items-center text-gray-700">
                 <img src="{% static 'icons/Icon_hour.png' %}" alt="Hours" class="w-3 h-3 mr-3" />
-                <span><span class="font-bold">Horário:</span> {{ ubs.openingHours }}</span>
+                <span><strong>Horário:</strong> {{ ubs.openingHours }}</span>
             </p>
             <p class="flex items-center text-gray-700">
                 <img src="{% static 'icons/Icon_location.png' %}" alt="Distance" class="w-3 h-3 mr-3" />
-                <span><span class="font-bold">Distância:</span> 2.5km</span>
+                <span><strong>Distância:</strong> {{ ubs.distance_km|default:"—" }} km</span>
             </p>
             <p class="flex items-center text-[#308038] font-medium">
                 <span>Status: Aberta</span>
@@ -125,13 +97,13 @@
                 {% for service in ubs.services %}
                 <div class="service-card">
                     {% if service == "Consulta Geral" %}
-                    <img src="{% static 'icons/Icon_consultaClinicaGeral.png' %}" alt="{{ service }}" />
+                        <img src="{% static 'icons/Icon_consultaClinicaGeral.png' %}" alt="{{ service }}" />
                     {% elif service == "Pediatria" %}
-                    <img src="{% static 'icons/Icon_cardiologico.png' %}" alt="{{ service }}" />
+                        <img src="{% static 'icons/Icon_cardiologico.png' %}" alt="{{ service }}" />
                     {% elif service == "Vacinação" %}
-                    <img src="{% static 'icons/Icon_vacinacao.png' %}" alt="{{ service }}" />
+                        <img src="{% static 'icons/Icon_vacinacao.png' %}" alt="{{ service }}" />
                     {% else %}
-                    <img src="{% static 'icons/Icon_services.png' %}" alt="{{ service }}" />
+                        <img src="{% static 'icons/Icon_services.png' %}" alt="{{ service }}" />
                     {% endif %}
                     <span class="text-sm font-medium text-[#174D8D]">{{ service }}</span>
                 </div>
@@ -159,38 +131,76 @@
 
         <!-- Location Section -->
         <section class="mb-10">
-            <h3 class="text-xl font-bold mb-6 text-[#2563EB]">Localização</h3>
-            <div class="map-container mb-6">
-                <div class="map-pin">
-                    <img src="{% static 'icons/Icon_location.png' %}" alt="Location Pin" class="w-6 h-6 invert" />
-                </div>
+            <h3 class="text-xl font-bold mb-4 text-[#2563EB]">Localização</h3>
+
+            <!-- Container do mapa: estilo inline para garantir height -->
+            <div id="map"
+                 class="map-container bg-white rounded shadow p-0"
+                 style="height: 400px;"
+                 data-ubs-lat="{{ ubs.latitude|default_if_none:'0' }}"
+                 data-ubs-lng="{{ ubs.longitude|default_if_none:'0' }}"
+                 data-user-lat="{{ user_lat|default_if_none:'0' }}"
+                 data-user-lng="{{ user_lng|default_if_none:'0' }}">
             </div>
-            <div class="button-container flex gap-4 mb-6">
-     <!-- Cada botão agora ocupa metade do container -->
-     <a
-       href="https://www.google.com/maps/search/{{ ubs.address|urlencode }}"
-       target="_blank"
-       class="flex-1 bg-[#2563EB] text-white py-4 px-6 rounded-xl font-bold text-lg
-              hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl
-              flex items-center justify-center space-x-2"
-     >
-       <img src="{% static 'icons/Icon_location.png' %}" alt="Location" class="w-5 h-5 invert" />
-       <span>Como Chegar</span>
-     </a>
 
-     <a
-       href="{% url 'scheduling' %}"
-       class="flex-1 bg-[#059669] text-white py-4 px-6 rounded-xl font-bold text-lg
-              hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl
-              flex items-center justify-center space-x-2"
-     >
-       <img src="{% static 'icons/Icon_hour.png' %}" alt="Schedule" class="w-5 h-5 invert" />
-       <span>Agendar Atendimento</span>
-     </a>
-   </div>
-
+            <!-- Botões de Ações -->
+            <div class="mt-4 flex flex-col md:flex-row gap-4">
+                <a href="https://www.google.com/maps/search/{{ ubs.address|urlencode }}"
+                   target="_blank"
+                   class="flex-1 bg-[#2563EB] text-white py-3 px-5 rounded-xl font-bold hover:bg-blue-700 flex items-center justify-center space-x-2">
+                    <img src="{% static 'icons/Icon_location.png' %}" alt="Location" class="w-5 h-5 invert" />
+                    <span>Como Chegar</span>
+                </a>
+                <a href="{% url 'scheduling' %}"
+                   class="flex-1 bg-[#059669] text-white py-3 px-5 rounded-xl font-bold hover:bg-green-700 flex items-center justify-center space-x-2">
+                    <img src="{% static 'icons/Icon_hour.png' %}" alt="Schedule" class="w-5 h-5 invert" />
+                    <span>Agendar Atendimento</span>
+                </a>
+            </div>
         </section>
     </div>
-</body>
 
+    <!-- JS do Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const mapDiv = document.getElementById('map');
+            const ubsLat = parseFloat(mapDiv.dataset.ubsLat);
+            const ubsLng = parseFloat(mapDiv.dataset.ubsLng);
+            const userLat = parseFloat(mapDiv.dataset.userLat);
+            const userLng = parseFloat(mapDiv.dataset.userLng);
+
+            if (!isNaN(ubsLat) && !isNaN(ubsLng)) {
+                // Inicializa
+                const map = L.map('map').setView([ubsLat, ubsLng], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                // UBS
+                L.marker([ubsLat, ubsLng])
+                 .addTo(map)
+                 .bindPopup("{{ ubs.name }}");
+
+                // Usuário
+                if (!isNaN(userLat) && !isNaN(userLng) && userLat && userLng) {
+                    const userIcon = L.icon({
+                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/447/447031.png',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
+                    });
+                    L.marker([userLat, userLng], { icon: userIcon })
+                     .addTo(map)
+                     .bindPopup("Você está aqui!")
+                     .openPopup();
+                }
+
+                // Força o Leaflet a redimensionar e ocupar todo o container
+                setTimeout(() => map.invalidateSize(), 200);
+            } else {
+                console.warn("Coordenadas inválidas:", ubsLat, ubsLng);
+            }
+        });
+    </script>
+</body>
 </html>

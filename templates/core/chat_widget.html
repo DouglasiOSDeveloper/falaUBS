@@ -1,0 +1,117 @@
+{% comment %}
+  Partial que exibe/gera o chat modal.
+{% endcomment %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<div id="chatModal">
+  <div class="chat-header">Robô FalaUBS</div>
+  <div class="chat-body" id="chatBody">
+    <div class="message robot">Olá! Como posso ajudar?</div>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="chatInput" placeholder="Digite sua pergunta..." />
+    <button id="sendBtn">Enviar</button>
+  </div>
+</div>
+
+<style>
+  /* Chat modal */
+  #chatModal {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 24px;
+    width: 300px;
+    max-height: 400px;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    overflow: hidden;
+    flex-direction: column;
+    z-index: 1000;
+  }
+  #chatModal.active { display: flex; }
+
+  .chat-header {
+    background: #2563EB;
+    color: white;
+    padding: 0.75rem;
+    font-weight: bold;
+  }
+  .chat-body {
+    flex: 1;
+    padding: 0.75rem;
+    overflow-y: auto;
+  }
+  .message { margin-bottom: 0.5rem; }
+  .message.user   { text-align: right; }
+  .message.robot  { text-align: left; }
+
+  .chat-input {
+    display: flex;
+    border-top: 1px solid #e5e7eb;
+  }
+  .chat-input input {
+    flex: 1;
+    border: none;
+    padding: 0.75rem;
+    outline: none;
+  }
+  .chat-input button {
+    background: #2563EB;
+    color: white;
+    border: none;
+    padding: 0 1rem;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  (function(){
+    const faq = {
+      "horário de funcionamento": "Nossas UBSs funcionam de segunda a sexta, das 7h às 19h.",
+      "vacinas": "Temos disponível BCG, Hepatite B, Tríplice Viral e Influenza.",
+      "endereço": "Selecione a UBS em ‘UBSs Próximas’ para ver o endereço.",
+      "agendamento": "Clique em 'Agendamento' no menu para marcar data e hora."
+    };
+
+    const openChatBtn = document.getElementById('openChatBtn');
+    const chatModal   = document.getElementById('chatModal');
+    const chatBody    = document.getElementById('chatBody');
+    const chatInput   = document.getElementById('chatInput');
+    const sendBtn     = document.getElementById('sendBtn');
+
+    openChatBtn.addEventListener('click', () => {
+      chatModal.classList.toggle('active');
+      if (chatModal.classList.contains('active')) chatInput.focus();
+    });
+
+    function appendMessage(text, who) {
+      const div = document.createElement('div');
+      div.classList.add('message', who);
+      div.textContent = text;
+      chatBody.appendChild(div);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const txt = chatInput.value.trim();
+      if (!txt) return;
+      appendMessage(txt, 'user');
+      chatInput.value = '';
+      const key = Object.keys(faq).find(k => txt.toLowerCase().includes(k));
+      const resposta = key ? faq[key]
+                           : "Desculpe, não entendi. Pode perguntar sobre horário, vacinas ou agendamento.";
+      setTimeout(() => appendMessage(resposta, 'robot'), 300);
+    });
+
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+
+  })();
+</script>

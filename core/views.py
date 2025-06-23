@@ -6,6 +6,7 @@ from pathlib import Path
 from django.conf import settings
 from .models import Agendamento
 from uuid import uuid4
+from geopy.distance import geodesic
 
 # Mocks de usuários JSON
 def carregar_usuarios_mock():
@@ -28,26 +29,57 @@ def login_view(request):
         usuarios = carregar_usuarios_mock()
         profissionais = carregar_profissionais_mock()
 
+        # Adição das coordenadas fixas para cada CPF
+        coordenadas_usuario = {
+            "111.111.111-11": {"latitude": -15.7975, "longitude": -47.8825},  # Ex.: Asa Sul
+            "222.222.222-22": {"latitude": -15.8380, "longitude": -48.0292}   # Ex.: Águas Claras
+        }
+
+        # Verificação de usuários normais
         for user in usuarios:
             if user['cpf'] == cpf and user['senha'] == senha:
-                request.session['usuario'] = user
+                user_data = user.copy()
+                if cpf in coordenadas_usuario:
+                    user_data.update(coordenadas_usuario[cpf])
+                request.session['usuario'] = user_data
+                request.session['user_lat'] = user_data.get('latitude')
+                request.session['user_lng'] = user_data.get('longitude')
                 return redirect('home')
 
+        # Verificação de profissionais
         for prof in profissionais:
             if prof['cpf'] == cpf and prof['senha'] == senha:
-                request.session['usuario'] = prof
+                prof_data = prof.copy()
+                if cpf in coordenadas_usuario:
+                    prof_data.update(coordenadas_usuario[cpf])
+                request.session['usuario'] = prof_data
+                request.session['user_lat'] = prof_data.get('latitude')
+                request.session['user_lng'] = prof_data.get('longitude')
                 return redirect('home')
 
         return render(request, 'core/login.html', {'erro': 'CPF ou senha incorretos.'})
-
     return render(request, 'core/login.html')
+
 
 # Página de Home
 def home_view(request):
     user = request.session.get('usuario')
     if not user:
         return redirect('login')
-    return render(request, 'core/home.html', {'usuario': user})
+
+    json_file_path = os.path.join(
+        os.path.dirname(__file__), 'data', 'ubs_data.json'
+    )
+    with open(json_file_path, 'r', encoding='utf-8') as file:
+        ubs_data = json.load(file)
+
+    return render(request, 'core/home.html', {
+        'usuario': user,
+        'user_lat': user.get('latitude'),
+        'user_lng': user.get('longitude'),
+        'ubs_data': json.dumps(ubs_data),
+    })
+
 
 # Página de Vacinação
 def vaccination_view(request):
@@ -111,14 +143,24 @@ def scheduling_view(request):
     })
 
 
-# Página de UBS Próximas
+#Página das UBS próximas
 def ubs_nearby_view(request):
+    user_lat = request.session.get('user_lat')
+    user_lng = request.session.get('user_lng')
+
     json_path = os.path.join(settings.BASE_DIR, 'core', 'data', 'ubs_data.json')
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     ubs_list = []
     for ubs in data.get('ubsList', []):
+        latitude = ubs.get('latitude')
+        longitude = ubs.get('longitude')
+        distance = None
+        # Cálculo da distância só se todas as coordenadas estiverem presentes
+        if user_lat is not None and user_lng is not None and latitude and longitude:
+            distance = round(geodesic((user_lat, user_lng), (latitude, longitude)).km, 2)
+
         ubs_list.append({
             'name': ubs['name'],
             'address': ubs['address'],
@@ -129,27 +171,20 @@ def ubs_nearby_view(request):
             'vaccines': [v['name'] for v in ubs['vaccines']],
             'accessibility': ubs['accessibility'],
             'age_groups': list({v['ageGroup'] for v in ubs['vaccines']}),
-            'distance_km': 1.2
+            'latitude': latitude,
+            'longitude': longitude,
+            'distance_km': distance
         })
 
-    # EXTRAÇÃO FORA DO LOOP
-    vaccine_names = sorted({
-        v['name']
-        for ubs in data.get('ubsList', [])
-        for v in ubs.get('vaccines', [])
-    })
-
-    service_names = sorted({
-        s
-        for ubs in data.get('ubsList', [])
-        for s in ubs.get('services', [])
-    })
-
+    vaccine_names = sorted({v['name'] for ubs in data.get('ubsList', []) for v in ubs.get('vaccines', [])})
+    service_names = sorted({s for ubs in data.get('ubsList', []) for s in ubs.get('services', [])})
     return render(request, 'core/ubs_nearby.html', {
         'ubs_list': ubs_list,
         'vaccine_names': vaccine_names,
         'service_names': service_names
     })
+
+
 
 # Página de UBS Específica
 def ubs_detail_view(request, ubs_name):
@@ -158,8 +193,20 @@ def ubs_detail_view(request, ubs_name):
 
     if not ubs:
         return render(request, 'core/ubs_detail.html', {'ubs': None})
+    user_lat = request.session.get('user_lat')
+    user_lng = request.session.get('user_lng')
+    ubs_lat = ubs.get('latitude')
+    ubs_lng = ubs.get('longitude')
+    return render(request, 'core/ubs_detail.html', {
+        'ubs': ubs,
+        'user_lat': user_lat,
+        'user_lng': user_lng,
+        'ubs_lat': ubs_lat,
+        'ubs_lng': ubs_lng,
+    })
 
-    return render(request, 'core/ubs_detail.html', {'ubs': ubs})
+
+
 
 #Load dos dados mockados das UBSs
 def load_mock_ubs_data():
