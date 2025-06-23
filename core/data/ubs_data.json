@@ -1,104 +1,125 @@
 {
   "ubsList": [
     {
-      "name": "UBS Central",
-      "address": "Rua Principal, 123, Centro",
+      "name": "UBS Raio de Sol",
+      "address": "SHIGS 707, Asa Sul, Brasília-DF",
+      "latitude": -15.8243,
+      "longitude": -47.9225,
       "openingHours": "08:00 - 17:00",
-      "phone": "(61) 1234-5678",
+      "phone": "(61) 3123-4567",
       "vaccines": [
         {
-          "name": "BCG",
-          "description": "Previne contra formas graves de tuberculose",
-          "ageGroup": "Criança",
-          "status": "Disponível",
-          "scheduling": "Sem agendamento",
-          "unit": "UBS Central"
-        },
-        {
-          "name": "Pentavalente",
-          "description": "Protege contra difteria, tétano, coqueluche, hepatite B e Haemophilus influenzae B",
-          "ageGroup": "Criança",
-          "status": "Disponível",
-          "scheduling": "Agendamento necessário",
-          "unit": "UBS Central"
-        },
-        {
-          "name": "Poliomielite",
-          "description": "Previne contra a paralisia infantil",
-          "ageGroup": "Criança",
+          "name": "Influenza",
+          "description": "Protege contra a gripe",
+          "ageGroup": "Criança,Adulto,Idoso",
           "status": "Campanha ativa",
           "scheduling": "Sem agendamento",
-          "unit": "UBS Central"
+          "unit": "UBS Raio de Sol"
+        },
+        {
+          "name": "Hepatite A",
+          "description": "Protege contra o vírus da Hepatite A",
+          "ageGroup": "Criança,Adulto",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Raio de Sol"
         }
       ],
-      "services": ["Consulta Geral", "Pediatria", "Vacinação"],
-      "accessibility": ["Acesso para cadeirantes", "Sinalização em Braille"]
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Ginecologia",
+        "Nutrição"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial"
+      ]
     },
     {
-      "name": "UBS Vila Nova",
-      "address": "Avenida das Flores, 456, Vila Nova",
-      "openingHours": "07:00 - 16:00",
-      "phone": "(61) 2345-6789",
+      "name": "UBS Estrela Norte",
+      "address": "SHCN 202, Asa Norte, Brasília-DF",
+      "latitude": -15.7413,
+      "longitude": -47.8855,
+      "openingHours": "07:30 - 18:30",
+      "phone": "(61) 3234-5678",
       "vaccines": [
         {
           "name": "HPV",
-          "description": "Previne contra o papilomavírus humano",
-          "ageGroup": "Adolescente",
+          "description": "Protege contra o vírus HPV",
+          "ageGroup": "Adolescente,Adulto",
           "status": "Disponível",
           "scheduling": "Agendamento necessário",
-          "unit": "UBS Vila Nova"
+          "unit": "UBS Estrela Norte"
         },
         {
-          "name": "Meningocócica ACWY",
-          "description": "Protege contra meningite e infecções generalizadas",
-          "ageGroup": "Adolescente",
+          "name": "Tríplice Viral",
+          "description": "Protege contra Sarampo, Caxumba e Rubéola",
+          "ageGroup": "Criança,Adulto",
           "status": "Disponível",
-          "scheduling": "Agendamento necessário",
-          "unit": "UBS Vila Nova"
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Estrela Norte"
         }
       ],
-      "services": ["Clínica Geral", "Ginecologia", "Vacinação"],
-      "accessibility": ["Acesso para cadeirantes"]
+      "services": [
+        "Clínica Geral",
+        "Ginecologia",
+        "Vacinação",
+        "Nutrição",
+        "Pré-natal"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille"
+      ]
     },
     {
-      "name": "UBS Jardim América",
-      "address": "Rua dos Ipês, 789, Jardim América",
+      "name": "UBS Sol Nascente",
+      "address": "QNM 1, Ceilândia, Brasília-DF",
+      "latitude": -15.8035,
+      "longitude": -48.1193,
       "openingHours": "08:00 - 18:00",
       "phone": "(61) 3456-7890",
       "vaccines": [
         {
-          "name": "Dupla Adulto",
-          "description": "Protege contra difteria e tétano",
-          "ageGroup": "Adulto",
-          "status": "Disponível",
-          "scheduling": "Sem agendamento",
-          "unit": "UBS Jardim América"
-        },
-        {
-          "name": "Hepatite B",
-          "description": "Previne contra hepatite B",
-          "ageGroup": "Adulto",
-          "status": "Disponível",
-          "scheduling": "Sem agendamento",
-          "unit": "UBS Jardim América"
-        },
-        {
           "name": "Febre Amarela",
-          "description": "Previne contra febre amarela",
+          "description": "Protege contra a febre amarela",
           "ageGroup": "Adulto,Idoso",
           "status": "Campanha ativa",
           "scheduling": "Sem agendamento",
-          "unit": "UBS Jardim América"
+          "unit": "UBS Sol Nascente"
+        },
+        {
+          "name": "Poliomielite",
+          "description": "Protege contra paralisia infantil",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Sol Nascente"
         }
       ],
-      "services": ["Clínica Geral", "Odontologia", "Vacinação"],
-      "accessibility": ["Acesso para cadeirantes", "Sinalização em Braille", "Intérprete de Libras"]
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Saúde da Mulher"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial"
+      ]
     },
     {
-      "name": "UBS Parque Verde",
-      "address": "Alameda dos Pinheiros, 321, Parque Verde",
-      "openingHours": "07:30 - 17:30",
-      "phone": "(61) 4567-8901",
+      "name": "UBS Nova Alvorada",
+      "address": "QSC 15, Samambaia, Brasília-DF",
+      "latitude": -15.8701,
+      "longitude": -48.1278,
+      "openingHours": "07:30 - 18:30",
+      "phone": "(61) 3567-8901",
       "vaccines": [
         {
           "name": "dTpa",
@@ -106,45 +127,712 @@
           "ageGroup": "Gestante",
           "status": "Disponível",
           "scheduling": "Agendamento necessário",
-          "unit": "UBS Parque Verde"
+          "unit": "UBS Nova Alvorada"
         },
         {
-          "name": "Influenza",
-          "description": "Previne contra gripe",
-          "ageGroup": "Gestante,Idoso",
-          "status": "Campanha ativa",
+          "name": "Hepatite B",
+          "description": "Protege contra o vírus da Hepatite B",
+          "ageGroup": "Adulto",
+          "status": "Disponível",
           "scheduling": "Sem agendamento",
-          "unit": "UBS Parque Verde"
+          "unit": "UBS Nova Alvorada"
         }
       ],
-      "services": ["Pré-natal", "Vacinação", "Acompanhamento gestacional"],
-      "accessibility": ["Acesso para cadeirantes", "Estacionamento preferencial"]
+      "services": [
+        "Pediatria",
+        "Clínica Geral",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial"
+      ]
     },
     {
-      "name": "UBS São José",
-      "address": "Rua das Palmeiras, 654, São José",
-      "openingHours": "08:00 - 17:00",
-      "phone": "(61) 5678-9012",
+      "name": "UBS Águas Vivas",
+      "address": "Rua 16 Sul, Águas Claras, Brasília-DF",
+      "latitude": -15.8385,
+      "longitude": -48.0199,
+      "openingHours": "08:00 - 18:00",
+      "phone": "(61) 3256-8901",
+      "vaccines": [
+        {
+          "name": "Pentavalente",
+          "description": "Protege contra Difteria, Tétano, Coqueluche, Hepatite B e Haemophilus influenzae B",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Águas Vivas"
+        },
+        {
+          "name": "Hepatite A",
+          "description": "Protege contra o vírus da Hepatite A",
+          "ageGroup": "Criança,Adulto",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Águas Vivas"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Ginecologia",
+        "Nutrição"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Intérprete de Libras"
+      ]
+    },
+    {
+      "name": "UBS Raiz Norte",
+      "address": "CSD 3, Taguatinga, Brasília-DF",
+      "latitude": -15.8383,
+      "longitude": -48.0583,
+      "openingHours": "07:30 - 18:30",
+      "phone": "(61) 3267-9012",
+      "vaccines": [
+        {
+          "name": "Febre Amarela",
+          "description": "Protege contra Febre Amarela",
+          "ageGroup": "Adulto,Idoso",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Raiz Norte"
+        },
+        {
+          "name": "Tríplice Viral",
+          "description": "Protege contra Sarampo, Caxumba e Rubéola",
+          "ageGroup": "Criança,Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Raiz Norte"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Ginecologia",
+        "Nutrição"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial"
+      ]
+    },
+    {
+      "name": "UBS Sebastião",
+      "address": "QSC 21, São Sebastião, Brasília-DF",
+      "latitude": -15.9185,
+      "longitude": -47.7849,
+      "openingHours": "08:00 - 18:00",
+      "phone": "(61) 3367-8901",
+      "vaccines": [
+        {
+          "name": "HPV",
+          "description": "Protege contra o vírus HPV",
+          "ageGroup": "Adolescente,Adulto",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Raio de Sol"
+        },
+        {
+          "name": "Hepatite B",
+          "description": "Protege contra o vírus da Hepatite B",
+          "ageGroup": "Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Raio de Sol"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Saúde da Mulher"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial"
+      ]
+    },
+    {
+      "name": "UBS Flor do Cerrado",
+      "address": "R. 8, Vicente Pires, Brasília-DF",
+      "latitude": -15.8039,
+      "longitude": -48.0023,
+      "openingHours": "08:00 - 17:30",
+      "phone": "(61) 3578-8901",
+      "vaccines": [
+        {
+          "name": "Influenza",
+          "description": "Protege contra a Gripe",
+          "ageGroup": "Criança,Adulto,Idoso",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Flor do Cerrado"
+        },
+        {
+          "name": "dTpa",
+          "description": "Protege contra Difteria, Tétano e Coqueluche",
+          "ageGroup": "Gestante",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Flor do Cerrado"
+        }
+      ],
+      "services": [
+        "Pediatria",
+        "Clínica Geral",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial"
+      ]
+    },
+    {
+      "name": "UBS Campo Verde",
+      "address": "QD 15, Planaltina, Brasília-DF",
+      "latitude": -15.6145,
+      "longitude": -47.6533,
+      "openingHours": "07:30 - 18:30",
+      "phone": "(61) 3589-9012",
+      "vaccines": [
+        {
+          "name": "Febre Amarela",
+          "description": "Protege contra Febre Amarela",
+          "ageGroup": "Criança,Adulto",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Campo Verde"
+        },
+        {
+          "name": "Poliomielite",
+          "description": "Protege contra Poliomielite",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Campo Verde"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Ginecologia",
+        "Nutrição"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial"
+      ]
+    },
+    {
+      "name": "UBS Verde Esperança",
+      "address": "QE 15, Guará, Brasília-DF",
+      "latitude": -15.8241,
+      "longitude": -47.9769,
+      "openingHours": "08:00 - 18:00",
+      "phone": "(61) 3389-1234",
+      "vaccines": [
+        {
+          "name": "Tríplice Viral",
+          "description": "Protege contra Sarampo, Caxumba e Rubéola",
+          "ageGroup": "Criança,Adolescente,Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Verde Esperança"
+        },
+        {
+          "name": "Varicela",
+          "description": "Protege contra Varicela",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Verde Esperança"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Ginecologia",
+        "Nutrição"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Raiz do Cerrado",
+      "address": "St. Central, Gama, Brasília-DF",
+      "latitude": -16.0123,
+      "longitude": -48.0567,
+      "openingHours": "08:00 - 18:00",
+      "phone": "(61) 3489-4567",
+      "vaccines": [
+        {
+          "name": "Hepatite A",
+          "description": "Protege contra Hepatite A",
+          "ageGroup": "Criança,Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Raiz do Cerrado"
+        },
+        {
+          "name": "dTpa",
+          "description": "Protege contra Difteria, Tétano e Coqueluche",
+          "ageGroup": "Gestante",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Raiz do Cerrado"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Fisioterapia",
+        "Nutrição",
+        "Ginecologia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Serra Alta",
+      "address": "Qd. 8, Sobradinho, Brasília-DF",
+      "latitude": -15.6835,
+      "longitude": -47.7951,
+      "openingHours": "08:30 - 17:30",
+      "phone": "(61) 3491-4321",
+      "vaccines": [
+        {
+          "name": "Influenza",
+          "description": "Protege contra Gripe",
+          "ageGroup": "Criança,Adulto,Idoso",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Serra Alta"
+        },
+        {
+          "name": "Febre Amarela",
+          "description": "Protege contra Febre Amarela",
+          "ageGroup": "Criança,Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Serra Alta"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Ginecologia",
+        "Nutrição",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Recanto Verde",
+      "address": "QN 1, Riacho Fundo, Brasília-DF",
+      "latitude": -15.8733,
+      "longitude": -48.0291,
+      "openingHours": "08:00 - 18:00",
+      "phone": "(61) 3333-8901",
+      "vaccines": [
+        {
+          "name": "Meningocócica ACWY",
+          "description": "Protege contra meningite e infecções generalizadas",
+          "ageGroup": "Adolescente,Adulto",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Recanto Verde"
+        },
+        {
+          "name": "Hepatite A",
+          "description": "Protege contra Hepatite A",
+          "ageGroup": "Criança,Adulto",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Recanto Verde"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Ginecologia",
+        "Nutrição",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Árvore do Cerrado",
+      "address": "CLSW 103, Sudoeste, Brasília-DF",
+      "latitude": -15.7973,
+      "longitude": -47.9212,
+      "openingHours": "07:30 - 18:30",
+      "phone": "(61) 3344-8901",
+      "vaccines": [
+        {
+          "name": "HPV",
+          "description": "Protege contra o vírus HPV",
+          "ageGroup": "Adolescente",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Árvore do Cerrado"
+        },
+        {
+          "name": "Febre Amarela",
+          "description": "Protege contra Febre Amarela",
+          "ageGroup": "Criança,Adulto",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Árvore do Cerrado"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Lago Sereno",
+      "address": "SHIN QL 5, Lago Norte, Brasília-DF",
+      "latitude": -15.7334,
+      "longitude": -47.8789,
+      "openingHours": "08:00 - 18:30",
+      "phone": "(61) 3368-8901",
       "vaccines": [
         {
           "name": "Pneumocócica 23",
-          "description": "Previne contra pneumonia e outras infecções",
+          "description": "Protege contra pneumonia e infecções pneumocócicas",
           "ageGroup": "Idoso",
           "status": "Disponível",
           "scheduling": "Agendamento necessário",
-          "unit": "UBS São José"
+          "unit": "UBS Lago Sereno"
         },
         {
-          "name": "Herpes Zóster",
-          "description": "Previne contra herpes zóster",
+          "name": "Varicela",
+          "description": "Protege contra Varicela",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Lago Sereno"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Ginecologia",
+        "Nutrição",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Águas Claras Norte",
+      "address": "3ª Av., Núcleo Bandeirante, Brasília-DF",
+      "latitude": -15.8701,
+      "longitude": -47.9501,
+      "openingHours": "08:00 - 17:30",
+      "phone": "(61) 3555-1234",
+      "vaccines": [
+        {
+          "name": "Hepatite B",
+          "description": "Protege contra Hepatite B",
+          "ageGroup": "Adulto,Gestante",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Águas Claras Norte"
+        },
+        {
+          "name": "Tríplice Viral",
+          "description": "Protege contra Sarampo, Caxumba e Rubéola",
+          "ageGroup": "Criança,Adolescente",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Águas Claras Norte"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Cerrado Vivo",
+      "address": "Qd. 101, Recanto das Emas, Brasília-DF",
+      "latitude": -15.9023,
+      "longitude": -48.0809,
+      "openingHours": "07:30 - 18:00",
+      "phone": "(61) 3567-8901",
+      "vaccines": [
+        {
+          "name": "Influenza",
+          "description": "Protege contra Gripe",
+          "ageGroup": "Criança,Adulto,Idoso",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Cerrado Vivo"
+        },
+        {
+          "name": "dTpa",
+          "description": "Protege contra Difteria, Tétano e Coqueluche",
+          "ageGroup": "Gestante",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Cerrado Vivo"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Vale Verde",
+      "address": "Qd. 7, Planaltina, Brasília-DF",
+      "latitude": -15.6151,
+      "longitude": -47.6532,
+      "openingHours": "08:30 - 18:30",
+      "phone": "(61) 3637-8901",
+      "vaccines": [
+        {
+          "name": "Febre Amarela",
+          "description": "Protege contra Febre Amarela",
+          "ageGroup": "Criança,Adulto",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Vale Verde"
+        },
+        {
+          "name": "Pneumocócica 23",
+          "description": "Protege contra pneumonia e infecções pneumocócicas",
           "ageGroup": "Idoso",
           "status": "Disponível",
           "scheduling": "Agendamento necessário",
-          "unit": "UBS São José"
+          "unit": "UBS Vale Verde"
         }
       ],
-      "services": ["Geriatria", "Vacinação", "Fisioterapia"],
-      "accessibility": ["Acesso para cadeirantes", "Piso tátil", "Sinalização em Braille"]
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Cerrado Norte",
+      "address": "Qd. 8, Sobradinho, Brasília-DF",
+      "latitude": -15.6389,
+      "longitude": -47.7841,
+      "openingHours": "08:00 - 17:30",
+      "phone": "(61) 3487-1234",
+      "vaccines": [
+        {
+          "name": "HPV",
+          "description": "Protege contra o Papilomavírus Humano",
+          "ageGroup": "Adolescente",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Cerrado Norte"
+        },
+        {
+          "name": "Hepatite A",
+          "description": "Protege contra Hepatite A",
+          "ageGroup": "Criança",
+          "status": "Disponível",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Cerrado Norte"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Vale Verde Leste",
+      "address": "Qd. 15, Riacho Fundo, Brasília-DF",
+      "latitude": -15.8649,
+      "longitude": -48.0063,
+      "openingHours": "07:30 - 18:00",
+      "phone": "(61) 3845-8901",
+      "vaccines": [
+        {
+          "name": "Meningocócica C",
+          "description": "Protege contra meningite C",
+          "ageGroup": "Criança,Adolescente",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Vale Verde Leste"
+        },
+        {
+          "name": "Varicela",
+          "description": "Protege contra Varicela",
+          "ageGroup": "Criança",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Vale Verde Leste"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
+    },
+    {
+      "name": "UBS Planalto Oeste",
+      "address": "Qd. 2, Sudoeste, Brasília-DF",
+      "latitude": -15.7972,
+      "longitude": -47.9157,
+      "openingHours": "08:30 - 18:30",
+      "phone": "(61) 3654-8901",
+      "vaccines": [
+        {
+          "name": "HPV",
+          "description": "Protege contra o Papilomavírus Humano",
+          "ageGroup": "Adolescente",
+          "status": "Disponível",
+          "scheduling": "Agendamento necessário",
+          "unit": "UBS Planalto Oeste"
+        },
+        {
+          "name": "Febre Amarela",
+          "description": "Protege contra Febre Amarela",
+          "ageGroup": "Criança,Adulto",
+          "status": "Campanha ativa",
+          "scheduling": "Sem agendamento",
+          "unit": "UBS Planalto Oeste"
+        }
+      ],
+      "services": [
+        "Clínica Geral",
+        "Pediatria",
+        "Vacinação",
+        "Pré-natal",
+        "Nutrição",
+        "Ginecologia",
+        "Fisioterapia"
+      ],
+      "accessibility": [
+        "Acesso para cadeirantes",
+        "Sinalização em Braille",
+        "Estacionamento preferencial",
+        "Piso tátil"
+      ]
     }
   ]
 }

@@ -52,7 +52,6 @@
                 </button>
             </div>
         </div>
-
         <!-- Filter modal -->
         <div id="filterModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -66,7 +65,6 @@
                             <option>{{ service }}</option>
                             {% endfor %}
                         </select>
-
                     </div>
                     <div>
                         <label class="block font-semibold mb-1">Vacinas Disponíveis</label>
@@ -78,13 +76,6 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block font-semibold mb-1">Faixa de Horário</label>
-                        <input type="time" id="openTime" class="border border-gray-300 rounded p-2 w-full mb-2"
-                            placeholder="Aberto a partir de" />
-                        <input type="time" id="closeTime" class="border border-gray-300 rounded p-2 w-full"
-                            placeholder="Fechado até" />
-                    </div>
-                    <div>
                         <label class="block font-semibold mb-1">Acessibilidade</label>
                         <div class="flex flex-col space-y-1">
                             <label><input type="checkbox" class="accessibilityFilter" value="Acesso para cadeirantes" />
@@ -92,15 +83,6 @@
                             <label><input type="checkbox" class="accessibilityFilter" value="Sinalização em Braille" />
                                 Sinalização em Braille</label>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block font-semibold mb-1">Faixa Etária Atendida</label>
-                        <select id="ageGroupFilter" class="w-full border border-gray-300 rounded p-2">
-                            <option value="">Todas</option>
-                            <option value="Crianças">Crianças</option>
-                            <option value="Adultos">Adultos</option>
-                            <option value="Idosos">Idosos</option>
-                        </select>
                     </div>
                     <div>
                         <label class="block font-semibold mb-1">Distância Máxima (km)</label>
@@ -118,7 +100,6 @@
                 </form>
             </div>
         </div>
-
         <div id="ubsContainer" class="space-y-6">
             {% for ubs in ubs_list %}
             <div class="ubs-card bg-white rounded-2xl shadow p-4 relative transition-shadow hover:shadow-lg"
@@ -150,6 +131,15 @@
                             <div class="flex items-center space-x-2">
                                 <img src="{% static 'icons/Icon_telephone.png' %}" alt="Phone Icon" class="w-5 h-5" />
                                 <p class="text-sm"><strong>Telefone:</strong> {{ ubs.phone }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <img src="{% static 'icons/Icon_location.png' %}" alt="Location Icon" class="w-5 h-5" />
+                                {% if ubs.distance_km %}
+                                <p class="text-sm"><strong>Distância:</strong> {{ ubs.distance_km|floatformat:1 }} km
+                                </p>
+                                {% else %}
+                                <p class="text-sm"><strong>Distância:</strong> Não disponível</p>
+                                {% endif %}
                             </div>
                             <div class="flex items-center space-x-2">
                                 <img src="{% static 'icons/Icon_services.png' %}" alt="Services Icon" class="w-5 h-5" />
@@ -234,30 +224,30 @@
                         <p><strong>Faixa Etária Atendida:</strong> {{ ubs.age_groups|join:", " }}</p>
                     </div>
                     <div>
+                        {% if ubs.distance_km %}
                         <p><strong>Distância:</strong> {{ ubs.distance_km }} km</p>
+                        {% else %}
+                        <p><strong>Distância:</strong> Não disponível</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
-
     <script>
         function toggleFilter() {
             const modal = document.getElementById('filterModal');
             modal.classList.toggle('hidden');
         }
-
         function filterUBS() {
             const input = document.getElementById('searchInput');
             const filter = input.value.toLowerCase();
             const cards = document.querySelectorAll('.ubs-card');
-
             cards.forEach(card => {
                 const name = card.getAttribute('data-name');
                 const address = card.getAttribute('data-address');
                 const district = card.getAttribute('data-district');
-
                 if (name.includes(filter) || address.includes(filter) || district.includes(filter)) {
                     card.style.display = '';
                 } else {
@@ -265,16 +255,12 @@
                 }
             });
         }
-
         function applyFilters(event) {
             event.preventDefault();
 
             const servicesSelect = document.getElementById('servicesFilter');
             const vaccinesSelect = document.getElementById('vaccinesFilter');
-            const openTime = document.getElementById('openTime').value;
-            const closeTime = document.getElementById('closeTime').value;
             const accessibilityCheckboxes = document.querySelectorAll('.accessibilityFilter:checked');
-            const ageGroup = document.getElementById('ageGroupFilter').value;
             const maxDistance = parseFloat(document.getElementById('maxDistance').value);
 
             const selectedServices = Array.from(servicesSelect.selectedOptions).map(opt => opt.value.toLowerCase());
@@ -287,45 +273,33 @@
                 const cardServices = card.getAttribute('data-services').split(',');
                 const cardVaccines = card.getAttribute('data-vaccines').split(',');
                 const cardAccessibility = card.getAttribute('data-accessibility').split(',');
-                const cardAgeGroups = card.getAttribute('data-age-groups').split(',');
                 const cardDistance = parseFloat(card.getAttribute('data-distance'));
 
-                // Check services filter
+                // ✅ Services
                 const servicesMatch = selectedServices.length === 0 || selectedServices.every(s => cardServices.includes(s));
-                // Check vaccines filter
-                const vaccinesMatch = selectedVaccines.length === 0 || selectedVaccines.every(v => cardVaccines.includes(v));
-                // Check accessibility filter
-                const accessibilityMatch = selectedAccessibility.length === 0 || selectedAccessibility.every(a => cardAccessibility.includes(a));
-                // Check age group filter
-                const ageGroupMatch = !ageGroup || ageGroup === "" || cardAgeGroups.includes(ageGroup.toLowerCase());
-                // Check distance filter
-                const distanceMatch = isNaN(maxDistance) || cardDistance <= maxDistance;
-                // Check opening hours filter (basic check)
-                let openTimeMatch = true;
-                let closeTimeMatch = true;
-                if (openTime) {
-                    const cardOpen = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[1];
-                    openTimeMatch = cardOpen >= openTime;
-                }
-                if (closeTime) {
-                    const cardClose = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[3];
-                    closeTimeMatch = cardClose <= closeTime;
-                }
 
-                if (servicesMatch && vaccinesMatch && accessibilityMatch && ageGroupMatch && distanceMatch && openTimeMatch && closeTimeMatch) {
+                // ✅ Vaccines
+                const vaccinesMatch = selectedVaccines.length === 0 || selectedVaccines.every(v => cardVaccines.includes(v));
+
+                // ✅ Accessibility
+                const accessibilityMatch = selectedAccessibility.length === 0 || selectedAccessibility.every(a => cardAccessibility.includes(a));
+
+                // ✅ Distance
+                const distanceMatch = isNaN(maxDistance) || cardDistance <= maxDistance;
+
+                // ✅ Final Check
+                if (servicesMatch && vaccinesMatch && accessibilityMatch && distanceMatch) {
                     card.style.display = '';
                 } else {
                     card.style.display = 'none';
                 }
             });
-
             toggleFilter();
         }
 
         function clearFilters() {
             const servicesSelect = document.getElementById('servicesFilter');
             const vaccinesSelect = document.getElementById('vaccinesFilter');
-
             // Clear multi-selects
             for (let i = 0; i < servicesSelect.options.length; i++) {
                 servicesSelect.options[i].selected = false;
@@ -333,27 +307,20 @@
             for (let i = 0; i < vaccinesSelect.options.length; i++) {
                 vaccinesSelect.options[i].selected = false;
             }
-
-            document.getElementById('openTime').value = '';
-            document.getElementById('closeTime').value = '';
             document.querySelectorAll('.accessibilityFilter').forEach(cb => cb.checked = false);
-            document.getElementById('ageGroupFilter').value = '';
             document.getElementById('maxDistance').value = '';
             document.getElementById('searchInput').value = '';
-
             // Show all cards after clearing filters
             const cards = document.querySelectorAll('.ubs-card');
             cards.forEach(card => {
                 card.style.display = '';
             });
         }
-
         function toggleExpand(element) {
             const card = element.closest('.ubs-card');
             const collapsedView = card.querySelector('.collapsed-view');
             const expandedView = card.querySelector('.expanded-view');
             const expandIcon = element.querySelector('button i');
-
             if (expandedView.classList.contains('hidden')) {
                 expandedView.classList.remove('hidden');
                 collapsedView.classList.add('hidden');
@@ -375,16 +342,17 @@
 
 </html>
 <script>
+    function normalizeString(str) {
+        return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+    }
     function toggleFilter() {
         const modal = document.getElementById('filterModal');
         modal.classList.toggle('hidden');
     }
-
     function filterUBS() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
         const cards = document.querySelectorAll('.ubs-card');
-
         cards.forEach(card => {
             const name = card.getAttribute('data-name');
             const address = card.getAttribute('data-address');
@@ -397,67 +365,9 @@
             }
         });
     }
-
-    function applyFilters(event) {
-        event.preventDefault();
-
-        const servicesSelect = document.getElementById('servicesFilter');
-        const vaccinesSelect = document.getElementById('vaccinesFilter');
-        const openTime = document.getElementById('openTime').value;
-        const closeTime = document.getElementById('closeTime').value;
-        const accessibilityCheckboxes = document.querySelectorAll('.accessibilityFilter:checked');
-        const ageGroup = document.getElementById('ageGroupFilter').value;
-        const maxDistance = parseFloat(document.getElementById('maxDistance').value);
-
-        const selectedServices = Array.from(servicesSelect.selectedOptions).map(opt => opt.value.toLowerCase());
-        const selectedVaccines = Array.from(vaccinesSelect.selectedOptions).map(opt => opt.value.toLowerCase());
-        const selectedAccessibility = Array.from(accessibilityCheckboxes).map(cb => cb.value.toLowerCase());
-
-        const cards = document.querySelectorAll('.ubs-card');
-
-        cards.forEach(card => {
-            const cardServices = card.getAttribute('data-services').split(',');
-            const cardVaccines = card.getAttribute('data-vaccines').split(',');
-            const cardAccessibility = card.getAttribute('data-accessibility').split(',');
-            const cardAgeGroups = card.getAttribute('data-age-groups').split(',');
-            const cardDistance = parseFloat(card.getAttribute('data-distance'));
-
-            // Check services filter
-            const servicesMatch = selectedServices.length === 0 || selectedServices.every(s => cardServices.includes(s));
-            // Check vaccines filter
-            const vaccinesMatch = selectedVaccines.length === 0 || selectedVaccines.every(v => cardVaccines.includes(v));
-            // Check accessibility filter
-            const accessibilityMatch = selectedAccessibility.length === 0 || selectedAccessibility.every(a => cardAccessibility.includes(a));
-            // Check age group filter
-            const ageGroupMatch = !ageGroup || ageGroup === "" || cardAgeGroups.includes(ageGroup.toLowerCase());
-            // Check distance filter
-            const distanceMatch = isNaN(maxDistance) || cardDistance <= maxDistance;
-            // Check opening hours filter (basic check)
-            let openTimeMatch = true;
-            let closeTimeMatch = true;
-            if (openTime) {
-                const cardOpen = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[1];
-                openTimeMatch = cardOpen >= openTime;
-            }
-            if (closeTime) {
-                const cardClose = card.querySelector('p strong:contains("Horário:")').parentNode.textContent.trim().split(' ')[3];
-                closeTimeMatch = cardClose <= closeTime;
-            }
-
-            if (servicesMatch && vaccinesMatch && accessibilityMatch && ageGroupMatch && distanceMatch && openTimeMatch && closeTimeMatch) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-
-        toggleFilter();
-    }
-
     function clearFilters() {
         const servicesSelect = document.getElementById('servicesFilter');
         const vaccinesSelect = document.getElementById('vaccinesFilter');
-
         // Clear multi-selects
         for (let i = 0; i < servicesSelect.options.length; i++) {
             servicesSelect.options[i].selected = false;
@@ -465,27 +375,20 @@
         for (let i = 0; i < vaccinesSelect.options.length; i++) {
             vaccinesSelect.options[i].selected = false;
         }
-
-        document.getElementById('openTime').value = '';
-        document.getElementById('closeTime').value = '';
         document.querySelectorAll('.accessibilityFilter').forEach(cb => cb.checked = false);
-        document.getElementById('ageGroupFilter').value = '';
         document.getElementById('maxDistance').value = '';
         document.getElementById('searchInput').value = '';
-
         // Show all cards after clearing filters
         const cards = document.querySelectorAll('.ubs-card');
         cards.forEach(card => {
             card.style.display = '';
         });
     }
-
     function toggleExpand(element) {
         const card = element.closest('.ubs-card');
         const collapsedView = card.querySelector('.collapsed-view');
         const expandedView = card.querySelector('.expanded-view');
         const expandIcon = element.querySelector('button i');
-
         if (expandedView.classList.contains('hidden')) {
             expandedView.classList.remove('hidden');
             collapsedView.classList.add('hidden');
@@ -504,5 +407,4 @@
     }
 </script>
 </body>
-
 </html>

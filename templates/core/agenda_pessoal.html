@@ -29,12 +29,12 @@
     </div>
 
     <!-- Barra de pesquisa e filtros -->
-    <form method="get" class="space-y-4 mb-6">
+    <form id="searchForm" method="get" class="space-y-4 mb-6">
 
       <!-- 1) Campo de busca livre -->
       <div class="relative">
         <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar agendamentos..."
-          class="w-full p-2 pl-10 border rounded-md" />
+          class="w-full p-2 pl-10 border rounded-md" oninput="filterAppointments()" />
         <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
       </div>
 
@@ -416,10 +416,87 @@
 
       // --- Feedback (inalterado) ----------------------------
       let currentProtocolFeedback = null;
-      function openFeedbackModal(protocolo) { /* ... */ }
-      function closeFeedbackModal() { /* ... */ }
-      function selectRating(r) { /* ... */ }
-      function submitFeedback() { /* ... */ }
+      function openFeedbackModal(protocolo) {
+        currentProtocolFeedback = protocolo;
+
+        // Exibe o modal
+        const modal = document.getElementById('feedbackModal');
+        modal.classList.remove('hidden');
+
+        // Limpa o estado atual
+        document.getElementById('selectedRating').value = '';
+        const ratingEmojis = modal.querySelectorAll('.cursor-pointer');
+        ratingEmojis.forEach(emoji => {
+          emoji.classList.remove('scale-125');
+        });
+        document.getElementById('feedbackComment').value = '';
+      }
+
+      function closeFeedbackModal() {
+        const modal = document.getElementById('feedbackModal');
+        modal.classList.add('hidden');
+        currentProtocolFeedback = null;
+      }
+
+      function selectRating(r) {
+        const selectedInput = document.getElementById('selectedRating');
+        selectedInput.value = r;
+
+        const modal = document.getElementById('feedbackModal');
+        const ratingEmojis = modal.querySelectorAll('.cursor-pointer');
+
+        ratingEmojis.forEach((emoji, index) => {
+          if (index + 1 === r) {
+            emoji.classList.add('scale-125');
+          } else {
+            emoji.classList.remove('scale-125');
+          }
+        });
+      }
+
+      function submitFeedback() {
+        const rating = document.getElementById('selectedRating').value;
+        const comment = document.getElementById('feedbackComment').value;
+
+        if (!rating) {
+          alert('Por favor, selecione uma avaliação antes de enviar.');
+          return;
+        }
+
+        console.log(`Feedback para protocolo ${currentProtocolFeedback}: ${rating} estrelas, Comentário: "${comment}"`);
+
+        alert('Feedback enviado com sucesso!');
+        closeFeedbackModal();
+      }
+
+      function normalizeText(text) {
+        return text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+      }
+
+      // ✅ Filtro para permitir pesquisa sem acento
+      function filterAppointments() {
+        const query = normalizeText(document.querySelector('input[name="q"]').value || "");
+        const cards = document.querySelectorAll('.bg-white.rounded-lg.shadow');
+
+        cards.forEach(card => {
+          const text = normalizeText(card.textContent);
+          if (text.includes(query) || !query) {
+            card.style.display = ""; // Exibe o card
+          } else {
+            card.style.display = "none"; // Oculta o card
+          }
+        });
+      }
+
+      // ✅ Impedir que Enter dê reload quando estiver filtrando
+      const searchForm = document.getElementById('searchForm');
+      searchForm.addEventListener('submit', function (event) {
+        const searchInput = searchForm.querySelector('input[name="q"]').value.trim();
+        if (searchInput) {
+          event.preventDefault();
+          // Não atualiza a página, pois estamos usando filtro direto
+        }
+      });
     </script>
   </body>
 
