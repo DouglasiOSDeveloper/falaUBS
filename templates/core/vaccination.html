@@ -43,12 +43,12 @@
     <header class="w-full bg-blue-700 text-white flex items-center justify-between px-4 py-3">
         <div class="flex items-center space-x-2">
             <h1 class="text-lg font-semibold flex items-center space-x-2">
-                <img src="{% static 'icons/Icon_ubs.png' %}" alt="UBS Icon" class="h-6" />
+                <img src="{% static 'core/icons/Icon_ubs.png' %}" alt="UBS Icon" class="h-6" />
                 <span>Bem-vindo ao FalaUBS</span>
             </h1>
         </div>
         <button aria-label="Menu" class="focus:outline-none">
-            <img src="{% static 'icons/Icon_menu_white.png' %}" alt="Menu Icon" class="h-8" />
+            <img src="{% static 'core/icons/Icon_menu_white.png' %}" alt="Menu Icon" class="h-8" />
         </button>
     </header>
 
@@ -56,7 +56,7 @@
         <!-- Back Button and Title -->
         <div class="flex items-center mb-6 space-x-4">
             <button aria-label="Back" onclick="window.history.back()" class="focus:outline-none">
-                <img src="{% static 'icons/Icon_return.png' %}" alt="Back Icon" class="w-6 h-6" />
+                <img src="{% static 'core/icons/Icon_return.png' %}" alt="Back Icon" class="w-6 h-6" />
             </button>
             <h2 class="text-2xl font-semibold">Vacinação</h2>
         </div>
@@ -70,10 +70,10 @@
                 placeholder="Pesquisar Vacinas" 
                 class="w-full p-3 rounded-lg search-bar focus:outline-none focus:ring-2 focus:ring-blue-500 pl-12 pr-12" 
             />
-            <img src="{% static 'icons/Icon_search.png' %}" alt="Search Icon" 
+            <img src="{% static 'core/icons/Icon_search.png' %}" alt="Search Icon" 
                 class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2" />
             <button class="absolute right-4 top-1/2 transform -translate-y-1/2 focus:outline-none">
-                <img src="{% static 'icons/Icon_microphone.png' %}" alt="Microphone Icon" class="w-5 h-5" />
+                <img src="{% static 'core/icons/Icon_microphone.png' %}" alt="Microphone Icon" class="w-5 h-5" />
             </button>
         </div>
 
@@ -279,14 +279,14 @@
                     }
                 </div>
                 <div class="absolute right-6 top-6">
-                    <img src="{% static 'icons/Icon_forward.png' %}" alt="Forward" class="w-5 h-5" />
+                    <img src="{% static 'core/icons/Icon_forward.png' %}" alt="Forward" class="w-5 h-5" />
                 </div>
                 <div class="space-y-3 mt-4">
                     ${ubsLocations.map(ubs => `
                         <div class="border-t pt-3">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <img src="{% static 'icons/Icon_location.png' %}" alt="Location" class="w-4 h-4 mr-2" />
+                                    <img src="{% static 'core/icons/Icon_location.png' %}" alt="Location" class="w-4 h-4 mr-2" />
                                     <span class="text-sm text-gray-700">${ubs.name}</span>
                                 </div>
                                 <div class="flex items-center space-x-2">

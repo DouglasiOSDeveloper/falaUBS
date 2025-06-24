@@ -5,10 +5,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
 <div id="chatModal">
-  <div class="chat-header">Robô FalaUBS</div>
+  <div class="chat-header">🤖 Robô FalaUBS</div>
   <div class="chat-body" id="chatBody">
-    <div class="message robot">Olá! Como posso ajudar?</div>
+    <div class="message robot">Olá! Eu sou o seu assistente virtual. Em que posso ajudar hoje?</div>
   </div>
+
+  <!-- Sugestões rápidas -->
+  <div class="chat-suggestions">
+    <button class="suggestion">Horário de funcionamento</button>
+    <button class="suggestion">Vacinas disponíveis</button>
+    <button class="suggestion">Como agendar</button>
+    <button class="suggestion">Localização das UBS</button>
+  </div>
+
   <div class="chat-input">
     <input type="text" id="chatInput" placeholder="Digite sua pergunta..." />
     <button id="sendBtn">Enviar</button>
@@ -22,8 +31,8 @@
     position: fixed;
     bottom: 80px;
     right: 24px;
-    width: 300px;
-    max-height: 400px;
+    width: 320px;
+    max-height: 450px;
     background: white;
     border-radius: 0.5rem;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -38,19 +47,41 @@
     color: white;
     padding: 0.75rem;
     font-weight: bold;
+    font-size: 1rem;
   }
   .chat-body {
     flex: 1;
     padding: 0.75rem;
     overflow-y: auto;
+    background: #F9FAFB;
   }
-  .message { margin-bottom: 0.5rem; }
+  .message { margin-bottom: 0.5rem; line-height: 1.4; }
   .message.user   { text-align: right; }
   .message.robot  { text-align: left; }
 
+  .chat-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    background: #F3F4F6;
+    gap: 0.5rem;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .suggestion {
+    background: #E5E7EB;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .suggestion:hover {
+    background: #D1D5DB;
+  }
+
   .chat-input {
     display: flex;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #E5E7EB;
   }
   .chat-input input {
     flex: 1;
@@ -68,50 +99,151 @@
 </style>
 
 <script>
-  (function(){
-    const faq = {
-      "horário de funcionamento": "Nossas UBSs funcionam de segunda a sexta, das 7h às 19h.",
-      "vacinas": "Temos disponível BCG, Hepatite B, Tríplice Viral e Influenza.",
-      "endereço": "Selecione a UBS em ‘UBSs Próximas’ para ver o endereço.",
-      "agendamento": "Clique em 'Agendamento' no menu para marcar data e hora."
-    };
-
-    const openChatBtn = document.getElementById('openChatBtn');
-    const chatModal   = document.getElementById('chatModal');
-    const chatBody    = document.getElementById('chatBody');
-    const chatInput   = document.getElementById('chatInput');
-    const sendBtn     = document.getElementById('sendBtn');
-
-    openChatBtn.addEventListener('click', () => {
-      chatModal.classList.toggle('active');
-      if (chatModal.classList.contains('active')) chatInput.focus();
-    });
-
-    function appendMessage(text, who) {
-      const div = document.createElement('div');
-      div.classList.add('message', who);
-      div.textContent = text;
-      chatBody.appendChild(div);
-      chatBody.scrollTop = chatBody.scrollHeight;
+(function(){
+  // Base de conhecimento
+  const faq = {
+    // horários
+    "horário de funcionamento": {
+      resposta: "Nossas UBSs atendem de segunda a sexta, das 07:00 às 19:00. Algumas abrem aos sábados, veja na seção 'UBSs Próximas'.",
+      followups: ["Vacinas disponíveis", "Como chegar"]
+    },
+    // vacinas
+    "vacinas disponíveis": {
+      resposta: "Temos BCG, Hepatite B, Tríplice Viral e Influenza. Confira a disponibilidade na UBS escolhida antes de ir.",
+      followups: ["Documentos necessários", "Acessibilidade"]
+    },
+    // agendamento
+    "agendar": {
+      resposta: "Para agendar, acesse 'Agendamento' ou diga 'Quero agendar'. Você poderá escolher data, horário e UBS.",
+      followups: ["Horário de funcionamento", "Localização das UBS"]
+    },
+    // localização
+    "localização": {
+      resposta: "Na aba 'UBSs Próximas' você vê o mapa das unidades próximas. Depois é só clicar na que preferir.",
+      followups: ["Como agendar", "Vacinas disponíveis"]
+    },
+    // documentos
+    "documentos necessários": {
+      resposta: "Para consultas: RG/CNH + cartão SUS. Para vacinas: só o cartão SUS.",
+      followups: ["Acessibilidade", "Vacinas disponíveis"]
+    },
+    // acessibilidade
+    "acessibilidade": {
+      resposta: "Todas as UBSs têm rampas, banheiros adaptados e vagas PCD. Informe-se na sua UBS favorita!",
+      followups: ["Localização das UBS", "Documentos necessários"]
+    },
+    // urgência
+    "urgência": {
+      resposta: "Em emergências graves, procure um pronto-socorro ou ligue 192 (SAMU). UBS não realiza atendimentos de urgência.",
+      followups: ["Localização das UBS"]
     }
+  };
 
-    sendBtn.addEventListener('click', () => {
-      const txt = chatInput.value.trim();
-      if (!txt) return;
-      appendMessage(txt, 'user');
-      chatInput.value = '';
-      const key = Object.keys(faq).find(k => txt.toLowerCase().includes(k));
-      const resposta = key ? faq[key]
-                           : "Desculpe, não entendi. Pode perguntar sobre horário, vacinas ou agendamento.";
-      setTimeout(() => appendMessage(resposta, 'robot'), 300);
+  // Respostas de fallback
+  const fallback = [
+    "Desculpe, não entendi. Pode reformular?",
+    "Estou aqui para ajudar com horários, vacinas, agendamento, localização ou documentos.",
+    "Tente perguntar sobre 'vacinas', 'horário' ou 'agendar'."
+  ];
+
+  // Elementos
+  const openChatBtn = document.getElementById('openChatBtn');
+  const chatModal   = document.getElementById('chatModal');
+  const chatBody    = document.getElementById('chatBody');
+  const chatInput   = document.getElementById('chatInput');
+  const sendBtn     = document.getElementById('sendBtn');
+  const suggArea    = document.querySelector('.chat-suggestions');
+
+  let lastKey = null;  // armazena o último tópico
+
+  // Gera botões de follow-up
+  function renderFollowups(keys){
+    suggArea.innerHTML = '';
+    keys.forEach(text => {
+      const btn = document.createElement('button');
+      btn.textContent = text;
+      btn.className = 'suggestion';
+      btn.addEventListener('click', () => sendQuestion(text));
+      suggArea.appendChild(btn);
     });
+  }
 
-    chatInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        sendBtn.click();
-      }
-    });
+  // Ao abrir, exibe sugestões gerais
+  openChatBtn.addEventListener('click', () => {
+    chatModal.classList.toggle('active');
+    if (chatModal.classList.contains('active')) {
+      chatInput.focus();
+      renderFollowups(Object.keys(faq));  // todas as chaves
+    }
+  });
 
-  })();
+  // Adiciona mensagem
+  function appendMessage(text, who){
+    const div = document.createElement('div');
+    div.classList.add('message', who);
+    div.textContent = text;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  // Simula typing indicator
+  function showTyping(){
+    const typing = document.createElement('div');
+    typing.id = 'typing';
+    typing.className = 'message robot';
+    typing.textContent = '...';
+    chatBody.appendChild(typing);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+  function hideTyping(){
+    const t = document.getElementById('typing');
+    if(t) t.remove();
+  }
+
+  // Lógica de resposta
+  function roboResponse(userText){
+    const txt = userText.toLowerCase();
+    // saudação
+    if (/(^|\s)(oi|olá|bom dia|boa tarde|boa noite)(\s|!|\.|$)/.test(txt)) {
+      lastKey = null;
+      return {resposta: "Olá! 😊 Sou o Robô FalaUBS. Em que posso ajudar hoje?", followups: Object.keys(faq)};
+    }
+    // tenta encontrar chave
+    const key = Object.keys(faq).find(k => txt.includes(k));
+    if (key) {
+      lastKey = key;
+      return faq[key];
+    }
+    // fallback
+    lastKey = null;
+    return {resposta: fallback[Math.floor(Math.random()*fallback.length)], followups: Object.keys(faq)};
+  }
+
+  // Envia pergunta e exibe resposta
+  function sendQuestion(text){
+    appendMessage(text, 'user');
+    chatInput.value = '';
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      const {resposta, followups} = roboResponse(text);
+      appendMessage(resposta, 'robot');
+      renderFollowups(followups || []);
+    }, 800);  // leve delay
+  }
+
+  // Eventos
+  sendBtn.addEventListener('click', () => {
+    const txt = chatInput.value.trim();
+    if (!txt) return;
+    sendQuestion(txt);
+  });
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+
+})();
 </script>
