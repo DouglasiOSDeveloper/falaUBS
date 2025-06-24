@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,12 +9,12 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
-        <div class="flex justify-between mb-4">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/SUS_logo.svg" alt="Logo SUS" class="h-10">
-            <img src="https://cdn.saude.gov.br/images/svg/bsf-logo.svg" alt="Logo Saúde Família" class="h-10">
+        <!-- Cabeçalho com ícone e título lado a lado -->
+        <div class="flex items-center justify-center mb-6 space-x-3">
+            <img src="{% static 'core/icons/Icon_ubs.png' %}" alt="UBS Icon" class="h-16 w-16" />
+            <h1 class="text-3xl font-bold">Fala, UBS!</h1>
         </div>
-        <h1 class="text-3xl font-bold mb-6">Fala, UBS!</h1>
-        <h2 class="text-xl font-semibold mb-4">Login – SouGov</h2>
+        <h2 class="text-xl font-semibold mb-6">Login – SouGov</h2>
 
         <form method="post">
             {% csrf_token %}
@@ -24,15 +25,22 @@
                 <label for="senha" class="block font-medium">Senha:</label>
                 <input type="password" id="senha" name="senha" class="w-full p-2 border border-gray-300 rounded mb-4" placeholder="Digite sua senha">
 
-                <label for="codigo" class="block font-medium">Código de Acesso</label>
-                <input type="text" id="codigo" name="codigo" class="w-full p-2 border border-gray-300 rounded mb-4" placeholder="Informe o código">
+                <label for="codigo" class="block font-medium">Código de Acesso:</label>
+                <input type="text" id="codigo" name="codigo" class="w-full p-2 border border-gray-300 rounded mb-6" placeholder="Informe o código de acesso">
             </div>
 
-            <button type="submit" class="w-full bg-blue-800 text-white py-2 rounded mb-2">Entrar</button>
-            <button type="button" class="w-full bg-white border border-gray-300 py-2 rounded font-semibold">Obter código de acesso</button>
+            <button type="submit" class="w-full bg-blue-800 text-white py-2 rounded mb-2 hover:bg-blue-900 transition">
+                Entrar
+            </button>
+            <button type="button" class="w-full bg-white border border-gray-300 py-2 rounded font-semibold hover:bg-gray-100 transition mb-4">
+                Obter código de acesso
+            </button>
 
-            <a href="#" class="text-sm text-blue-600 block mt-2">Esqueci minha senha</a>
-            <p class="text-xs text-gray-500 mt-4">Ainda não tem cadastro? Acesse o portal do governo em <a href="https://www.gov.br" target="_blank" class="text-blue-600">gov.br</a></p>
+            <a href="#" class="text-sm text-blue-600 block mb-4 hover:underline">Esqueci minha senha</a>
+            <p class="text-xs text-gray-500">
+                Ainda não tem cadastro? Acesse o portal do governo em 
+                <a href="https://www.gov.br" target="_blank" class="text-blue-600 hover:underline">gov.br</a>
+            </p>
         </form>
     </div>
 </body>

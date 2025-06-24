@@ -189,20 +189,34 @@ def ubs_nearby_view(request):
 # Página de UBS Específica
 def ubs_detail_view(request, ubs_name):
     data = load_mock_ubs_data()
-    ubs = next((u for u in data['ubsList'] if u['name'] == ubs_name), None)
-
-    if not ubs:
+    u = next((u for u in data['ubsList'] if u['name'] == ubs_name), None)
+    if not u:
         return render(request, 'core/ubs_detail.html', {'ubs': None})
+
+    # pega coordenadas do usuário e da UBS
     user_lat = request.session.get('user_lat')
     user_lng = request.session.get('user_lng')
-    ubs_lat = ubs.get('latitude')
-    ubs_lng = ubs.get('longitude')
+    ubs_lat  = u.get('latitude')
+    ubs_lng  = u.get('longitude')
+
+    # calcula distância, quando possível
+    distance = None
+    try:
+        if user_lat is not None and user_lng is not None and ubs_lat and ubs_lng:
+            # garantir floats
+            user_coords = (float(user_lat), float(user_lng))
+            ubs_coords  = (float(ubs_lat),   float(ubs_lng))
+            distance = round(geodesic(user_coords, ubs_coords).km, 1)
+    except Exception:
+        distance = None
+
+    # injeta no dict da UBS
+    u['distance_km'] = distance
+
     return render(request, 'core/ubs_detail.html', {
-        'ubs': ubs,
+        'ubs': u,
         'user_lat': user_lat,
         'user_lng': user_lng,
-        'ubs_lat': ubs_lat,
-        'ubs_lng': ubs_lng,
     })
 
 
@@ -219,6 +233,12 @@ def personal_schedule_view(request):
     user = request.session.get('usuario')
     if not user:
         return redirect('login')
+    
+    # Limpar tudo se 'clear_all' for passado na querystring
+    if request.method == 'GET' and request.GET.get('clear_all') == '1':
+        request.session.pop('agendamentos', None)
+        # redireciona sem o parâmetro para evitar loop
+        return redirect('agenda_pessoal')
 
     # Inicializa lista de agendamentos na sessão, se necessário
     if 'agendamentos' not in request.session:
